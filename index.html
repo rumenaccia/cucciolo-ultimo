@@ -1,1 +1,333 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cucciolo - Il tuo animale domestico che cresce">
+  <meta name="theme-color" content="#FFEAF7">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><text x='50%' y='50%' font-size='120' text-anchor='middle' dominant-baseline='middle'>🐱</text></svg>">
+  <title>Cucciolo - Il tuo animale</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Quicksand', sans-serif; background: linear-gradient(135deg, #FFE8F5, #E8F5FF); min-height: 100vh; }
+    #root { width: 100%; max-width: 420px; height: 100vh; margin: 0 auto; display: flex; flex-direction: column; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(74, 58, 107, 0.3); border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
 
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <script>
+    const { useState, useEffect, useCallback } = React;
+
+    const ANIMALS = [
+      { id: "ragdoll", name: "Ragdoll", img: "ragdoll.PNG" },
+      { id: "gatto_nero", name: "Gatto Nero", img: "gattonero.PNG" },
+      { id: "gatto_grigio", name: "Gatto Grigio", img: "gattogrigio.PNG" },
+      { id: "siamese", name: "Siamese", img: "siamese.PNG" },
+      { id: "tabby", name: "Tabby", img: "tabby.PNG" },
+      { id: "cane_bianco", name: "Cane Bianco", img: "canebianco.PNG" },
+      { id: "cane_marrone", name: "Cane Marrone", img: "canemarrone.PNG" },
+      { id: "coniglio", name: "Coniglio", img: "coniglio.PNG" },
+      { id: "drago", name: "Drago Nero", img: "dragonero.PNG" },
+      { id: "tartaruga", name: "Tartaruga", img: "tartaruga.PNG" },
+    ];
+
+    const MILESTONE_TYPES = {
+      studio: { label: "Studio", unit: "ore", perUnit: 1.5, emoji: "📚" },
+      dormi: { label: "Sonno", unit: "ore", perUnit: 0.8, emoji: "😴" },
+      esame: { label: "Esame passato", unit: "count", perUnit: 50, emoji: "🎓" },
+      denti: { label: "Lavato i denti", unit: "volte", perUnit: 2, emoji: "🪥" },
+      allenamento: { label: "Allenamento", unit: "ore", perUnit: 3, emoji: "💪" },
+    };
+
+    const RECIPES = [
+      { id: "cap", name: "Caprese", emoji: "🥗", vita: 30 },
+      { id: "pesto", name: "Pasta al pesto", emoji: "🍝", vita: 50 },
+      { id: "tira", name: "Tiramisù", emoji: "🍰", vita: 60 },
+      { id: "carb", name: "Carbonara", emoji: "🍝", vita: 55 },
+      { id: "gnocchi", name: "Gnocchi", emoji: "🍲", vita: 48 },
+      { id: "brusc", name: "Bruschetta", emoji: "🥖", vita: 35 },
+      { id: "risotto", name: "Risotto funghi", emoji: "🍚", vita: 52 },
+      { id: "pizza", name: "Pizza", emoji: "🍕", vita: 58 },
+      { id: "amatri", name: "Amatriciana", emoji: "🍝", vita: 53 },
+      { id: "osso", name: "Osso buco", emoji: "🍖", vita: 65 },
+    ];
+
+    const MOTIVATIONAL_QUOTES = [
+      "Oggi è un giorno perfetto per non fumare! 💪",
+      "L'acqua è la miglior medicina. Bevi! 💧",
+      "Mangia bene, il tuo animale ti ringrazierà 🥗",
+      "Ogni traguardo è un passo verso la felicità ⭐",
+      "Prendersi cura di te = prendersi cura di lui 💚",
+      "Non fumare oggi = +2 anni per il tuo animale 🎉",
+      "Un drink in meno = salute in più 🌟",
+      "Il tuo animale crede in te! 🐾",
+      "Riposa bene, recupera le forze 😴",
+      "Muoviti un po'! Il tuo corpo e il tuo animale ringraziano 🏃",
+    ];
+
+    const MAX_VITA_DAYS = 1825;
+
+    function stageFor(points) {
+      if (points < 100) return { key: "cucciolo", label: "Cucciolotto", icon: "🍼" };
+      if (points < 250) return { key: "adolescente", label: "Adolescente", icon: "🎒" };
+      if (points < 450) return { key: "piccolo_adulto", label: "Piccolo Adulto", icon: "📚" };
+      if (points < 700) return { key: "adulto", label: "Adulto", icon: "💼" };
+      return { key: "anziano", label: "Anziano", icon: "🧓" };
+    }
+
+    function uid() {
+      return Math.random().toString(36).slice(2, 9);
+    }
+
+    function formatDays(days) {
+      const years = Math.floor(days / 365);
+      const months = Math.floor((days % 365) / 30);
+      if (years > 0) return `${years}a ${months}m`;
+      return `${Math.floor(days)}g`;
+    }
+
+    function AnimalSelector({ onSelect }) {
+      return React.createElement("div", { style: { padding: "40px 22px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", textAlign: "center", background: "linear-gradient(135deg, #FFE8F5, #E8F5FF)" } },
+        React.createElement("div", { style: { fontSize: 52, marginBottom: 12 } }, "🐾"),
+        React.createElement("h1", { style: { fontSize: 28, marginBottom: 8, color: "#4A3A6B", fontWeight: 700, fontFamily: "'Fredoka', sans-serif" } }, "Scegli il tuo animale!"),
+        React.createElement("p", { style: { fontSize: 12, color: "#8F84B0", marginBottom: 24 } }, "Quale animale vuoi che cresca con te?"),
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, marginBottom: 24, maxWidth: "100%" } },
+          ANIMALS.map(animal => React.createElement("button", { key: animal.id, onClick: () => onSelect(animal), style: { background: "linear-gradient(135deg, rgba(255,197,61,0.6), rgba(255,217,102,0.6))", border: "2px solid #FFC53D", borderRadius: 14, padding: 16, cursor: "pointer", fontFamily: "'Quicksand', sans-serif", fontSize: 14, fontWeight: 700, color: "#4A3A6B", display: "flex", flexDirection: "column", alignItems: "center", gap: 8 } },
+            React.createElement("img", { src: animal.img, style: { width: 80, height: 80, objectFit: "contain" }, alt: animal.name }),
+            React.createElement("div", null, animal.name)
+          ))
+        )
+      );
+    }
+
+    function Home({ profile, stage, animal }) {
+      const vitaPercent = (profile.vitaDays / MAX_VITA_DAYS) * 100;
+      const getLifeColor = () => vitaPercent > 70 ? "#45D6B5" : vitaPercent > 40 ? "#FFE070" : "#FF6FB0";
+
+      return React.createElement("div", { style: { padding: "4px 4px 20px" } },
+        React.createElement("div", { style: { textAlign: "center", marginBottom: 16 } },
+          React.createElement("img", { src: animal.img, alt: animal.name, style: { width: 240, height: 240, objectFit: "contain", display: "block", margin: "0 auto 12px", filter: "drop-shadow(0 10px 20px rgba(74,58,107,.2))" } }),
+          React.createElement("div", { style: { fontWeight: 700, fontSize: 14, color: "#4A3A6B" } }, stage.label),
+          React.createElement("div", { style: { fontSize: 11, color: "#8F84B0" } }, "⭐ " + profile.points + " pt")
+        ),
+        React.createElement("div", { style: { background: "rgba(255, 232, 240, 0.6)", backdropFilter: "blur(10px)", borderRadius: 14, padding: 14, marginBottom: 12, border: "1px solid rgba(255, 200, 220, 0.3)" } },
+          React.createElement("div", { style: { display: "flex", justifyContent: "space-between", marginBottom: 8 } },
+            React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#4A3A6B" } }, "Vita"),
+            React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#FF6FB0" } }, formatDays(profile.vitaDays))
+          ),
+          React.createElement("div", { style: { background: "rgba(255, 212, 229, 0.8)", borderRadius: 10, height: 24, overflow: "hidden", position: "relative", border: "1px solid rgba(255, 255, 255, 0.4)" } },
+            React.createElement("div", { style: { background: getLifeColor(), height: "100%", width: vitaPercent + "%", transition: "width 0.3s ease", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#fff" } }, vitaPercent > 10 ? Math.round(vitaPercent) + "%" : "")
+          ),
+          React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginTop: 6, textAlign: "center" } }, "Max 5 anni")
+        ),
+        React.createElement("div", { style: { background: "rgba(255, 243, 196, 0.6)", backdropFilter: "blur(10px)", borderRadius: 12, padding: 12 } },
+          React.createElement("div", { style: { fontSize: 11, color: "#8F84B0", marginBottom: 4 } }, "Motto del giorno"),
+          React.createElement("div", { style: { fontSize: 12, color: "#4A9FE0", fontStyle: "italic" } }, '"' + MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)] + '"')
+        )
+      );
+    }
+
+    function Traguardi({ profile, setProfile }) {
+      const [activeType, setActiveType] = useState(null);
+      const [inputValue, setInputValue] = useState("");
+
+      const handleAdd = (typeKey) => {
+        if (!inputValue || parseFloat(inputValue) <= 0) return;
+        const type = MILESTONE_TYPES[typeKey];
+        const points = Math.floor(parseFloat(inputValue) * type.perUnit);
+        const milestone = { id: uid(), type: typeKey, amount: parseFloat(inputValue), points, date: new Date().toISOString() };
+        const newProfile = { ...profile, points: profile.points + points, milestones: [milestone, ...(profile.milestones || [])] };
+        setProfile(newProfile);
+        setInputValue("");
+        setActiveType(null);
+      };
+
+      return React.createElement("div", { style: { padding: "4px 4px" } },
+        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: "#4A3A6B", fontFamily: "'Fredoka', sans-serif" } }, "I tuoi traguardi"),
+        React.createElement("p", { style: { fontSize: 12, color: "#8F84B0", marginBottom: 12 } }, "Studio, sonno, esami, igiene, allenamento."),
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 16 } },
+          Object.entries(MILESTONE_TYPES).map(([key, type]) => React.createElement("button", { key, onClick: () => setActiveType(activeType === key ? null : key), style: { background: activeType === key ? "rgba(69, 214, 181, 0.8)" : "rgba(251, 249, 255, 0.6)", border: activeType === key ? "2px solid #45D6B5" : "1px solid rgba(239, 230, 255, 0.3)", borderRadius: 10, padding: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, cursor: "pointer", fontSize: 10, color: activeType === key ? "#fff" : "#4A3A6B", fontWeight: activeType === key ? 700 : 500, fontFamily: "'Quicksand', sans-serif" } },
+            React.createElement("div", { style: { fontSize: 18 } }, type.emoji),
+            React.createElement("div", null, type.label)
+          ))
+        ),
+        activeType && React.createElement("div", { style: { background: "rgba(69, 214, 181, 0.15)", borderRadius: 12, padding: 12, marginBottom: 16, border: "1px solid rgba(69, 214, 181, 0.3)" } },
+          React.createElement("label", { style: { fontSize: 11, color: "#45D6B5", marginBottom: 8, display: "block", fontWeight: 700 } }, "Quanto " + MILESTONE_TYPES[activeType].unit + "?"),
+          React.createElement("div", { style: { display: "flex", gap: 8 } },
+            React.createElement("input", { style: { flex: 1, padding: "8px 10px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.4)", background: "rgba(255, 255, 255, 0.5)", fontSize: 12, fontFamily: "'Quicksand', sans-serif" }, type: "number", value: inputValue, onChange: (e) => setInputValue(e.target.value), placeholder: "Es. 3", min: "0" }),
+            React.createElement("button", { style: { background: "linear-gradient(135deg, #45D6B5, #5FE3CA)", color: "#fff", border: "none", borderRadius: 8, padding: "8px 14px", fontWeight: 700, cursor: "pointer", fontSize: 12, fontFamily: "'Quicksand', sans-serif" }, onClick: () => handleAdd(activeType) }, "Registra")
+          )
+        ),
+        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: "#4A3A6B", fontFamily: "'Fredoka', sans-serif", marginTop: 20 } }, "Storico"),
+        !profile.milestones || profile.milestones.length === 0 ? React.createElement("p", { style: { fontSize: 12, color: "#8F84B0" } }, "Nessun traguardo ancora.") :
+        (profile.milestones || []).slice(0, 10).map((m) => React.createElement("div", { key: m.id, style: { background: "rgba(251, 249, 255, 0.6)", borderRadius: 10, padding: 10, marginBottom: 8, display: "flex", gap: 8, alignItems: "center", border: "1px solid rgba(239, 230, 255, 0.3)" } },
+          React.createElement("span", { style: { fontSize: 20 } }, MILESTONE_TYPES[m.type].emoji),
+          React.createElement("div", { style: { flex: 1 } },
+            React.createElement("div", { style: { fontWeight: 600, fontSize: 12, color: "#4A3A6B" } }, MILESTONE_TYPES[m.type].label),
+            React.createElement("div", { style: { fontSize: 10, color: "#8F84B0" } }, m.amount + " " + MILESTONE_TYPES[m.type].unit)
+          ),
+          React.createElement("span", { style: { color: "#45D6B5", fontWeight: 700, fontSize: 12 } }, "+" + m.points)
+        ))
+      );
+    }
+
+    function CucinaSalute({ profile, setProfile }) {
+      const [selected, setSelected] = useState([]);
+
+      const handleCook = () => {
+        if (selected.length === 0) return;
+        const recipe = RECIPES[Math.floor(Math.random() * RECIPES.length)];
+        const newProfile = { ...profile, vitaDays: Math.min(MAX_VITA_DAYS, profile.vitaDays + recipe.vita), points: profile.points + 15, discoveredRecipes: [...(profile.discoveredRecipes || []), recipe.id] };
+        setProfile(newProfile);
+        setSelected([]);
+        alert("✨ Hai cucinato " + recipe.name + "! +" + recipe.vita + " giorni!");
+      };
+
+      const handleSmoke = () => {
+        const newProfile = { ...profile, vitaDays: Math.max(0, profile.vitaDays - 730), cigarettes: (profile.cigarettes || 0) + 1, lastSmoke: new Date().toISOString() };
+        setProfile(newProfile);
+      };
+
+      const handleDrink = () => {
+        const newProfile = { ...profile, vitaDays: Math.max(0, profile.vitaDays - 365), drinks: (profile.drinks || 0) + 1, lastDrink: new Date().toISOString() };
+        setProfile(newProfile);
+      };
+
+      return React.createElement("div", { style: { padding: "4px 4px" } },
+        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: "#4A3A6B", fontFamily: "'Fredoka', sans-serif" } }, "Cucina 🍳"),
+        React.createElement("button", { style: { width: "100%", background: "linear-gradient(135deg, #45D6B5, #5FE3CA)", color: "#fff", border: "none", borderRadius: 12, padding: "10px", fontWeight: 700, cursor: "pointer", marginBottom: 16, fontFamily: "'Quicksand', sans-serif" }, onClick: handleCook }, "🍲 Cucina!"),
+        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: "#4A3A6B", fontFamily: "'Fredoka', sans-serif", marginTop: 20 } }, "La tua salute ⚕️"),
+        React.createElement("div", { style: { background: "rgba(255, 111, 176, 0.15)", borderRadius: 12, padding: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 } },
+          React.createElement("div", { style: { textAlign: "center" } },
+            React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBottom: 4 } }, "Sigarette"),
+            React.createElement("div", { style: { fontSize: 24, fontWeight: 700, color: "#FF6FB0" } }, profile.cigarettes || 0),
+            React.createElement("button", { style: { background: "linear-gradient(135deg, #FF6FB0, #FF8FBF)", color: "#fff", border: "none", borderRadius: 8, padding: "6px", fontWeight: 700, cursor: "pointer", marginTop: 8, fontSize: 11, width: "100%", fontFamily: "'Quicksand', sans-serif" }, onClick: handleSmoke }, "+1 (−2 anni)")
+          ),
+          React.createElement("div", { style: { textAlign: "center" } },
+            React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBottom: 4 } }, "Drink"),
+            React.createElement("div", { style: { fontSize: 24, fontWeight: 700, color: "#FF6FB0" } }, profile.drinks || 0),
+            React.createElement("button", { style: { background: "linear-gradient(135deg, #FF6FB0, #FF8FBF)", color: "#fff", border: "none", borderRadius: 8, padding: "6px", fontWeight: 700, cursor: "pointer", marginTop: 8, fontSize: 11, width: "100%", fontFamily: "'Quicksand', sans-serif" }, onClick: handleDrink }, "+1 (−1 anno)")
+          )
+        )
+      );
+    }
+
+    function Statistiche({ profile }) {
+      const cleanSmokeDays = profile.lastSmoke ? Math.floor((new Date() - new Date(profile.lastSmoke)) / (1000 * 60 * 60 * 24)) : -1;
+      const cleanDrinkDays = profile.lastDrink ? Math.floor((new Date() - new Date(profile.lastDrink)) / (1000 * 60 * 60 * 24)) : -1;
+
+      return React.createElement("div", { style: { padding: "4px 4px" } },
+        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: "#4A3A6B", fontFamily: "'Fredoka', sans-serif" } }, "Le tue statistiche 📊"),
+        React.createElement("div", { style: { background: "rgba(69, 214, 181, 0.15)", borderRadius: 12, padding: 14, marginBottom: 12, border: "1px solid rgba(69, 214, 181, 0.3)" } },
+          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#4A3A6B", marginBottom: 8 } }, "Giorni senza fumare"),
+          React.createElement("div", { style: { fontSize: 28, fontWeight: 700, color: "#45D6B5" } }, cleanSmokeDays >= 0 ? cleanSmokeDays : "—"),
+          cleanSmokeDays >= 30 && React.createElement("div", { style: { fontSize: 10, color: "#45D6B5", marginTop: 4, fontWeight: 700 } }, "🎉 +1 anno rigenerato!")
+        ),
+        React.createElement("div", { style: { background: "rgba(69, 214, 181, 0.15)", borderRadius: 12, padding: 14, marginBottom: 12, border: "1px solid rgba(69, 214, 181, 0.3)" } },
+          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#4A3A6B", marginBottom: 8 } }, "Giorni senza bere"),
+          React.createElement("div", { style: { fontSize: 28, fontWeight: 700, color: "#45D6B5" } }, cleanDrinkDays >= 0 ? cleanDrinkDays : "—"),
+          cleanDrinkDays >= 7 && React.createElement("div", { style: { fontSize: 10, color: "#45D6B5", marginTop: 4, fontWeight: 700 } }, "🎉 +1 anno rigenerato!")
+        ),
+        React.createElement("div", { style: { background: "rgba(251, 249, 255, 0.6)", borderRadius: 12, padding: 14, border: "1px solid rgba(239, 230, 255, 0.3)" } },
+          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#4A3A6B", marginBottom: 8 } }, "Traguardi totali"),
+          React.createElement("div", { style: { fontSize: 24, fontWeight: 700, color: "#B3A5D6" } }, (profile.milestones || []).length)
+        )
+      );
+    }
+
+    const PROFILE_DEFAULTS = { points: 0, vitaDays: MAX_VITA_DAYS, cigarettes: 0, drinks: 0, milestones: [], discoveredRecipes: [] };
+
+    function CucciolataApp() {
+      const [profile, setProfile] = useState(null);
+      const [animal, setAnimal] = useState(null);
+      const [loaded, setLoaded] = useState(false);
+      const [tab, setTab] = useState("home");
+      const [askChange, setAskChange] = useState(false);
+
+      useEffect(() => {
+        try {
+          const saved = localStorage.getItem("pet-profile");
+          const savedAnimal = localStorage.getItem("pet-animal");
+          if (saved) setProfile(JSON.parse(saved));
+          if (savedAnimal) setAnimal(JSON.parse(savedAnimal));
+        } catch (e) {}
+        setLoaded(true);
+      }, []);
+
+      const saveProfile = useCallback((p) => {
+        setProfile(p);
+        try { localStorage.setItem("pet-profile", JSON.stringify(p)); } catch (e) {}
+      }, []);
+
+      const selectAnimal = (selected) => {
+        setAnimal(selected);
+        try { localStorage.setItem("pet-animal", JSON.stringify(selected)); } catch (e) {}
+        if (profile && profile.animalType === selected.id) {
+          saveProfile({ ...profile, petName: selected.name, animalType: selected.id });
+        } else {
+          saveProfile({ ...PROFILE_DEFAULTS, petName: selected.name, animalType: selected.id });
+        }
+      };
+
+      if (!loaded || !animal) return React.createElement(AnimalSelector, { onSelect: selectAnimal });
+      if (!profile) return React.createElement(AnimalSelector, { onSelect: selectAnimal });
+
+      const stage = stageFor(profile.points);
+      const isDead = profile.vitaDays <= 0;
+
+      return React.createElement("div", { style: { fontFamily: "'Quicksand', sans-serif", background: "linear-gradient(135deg, #FFE8F5, #E8F5FF)", minHeight: "100vh", maxWidth: 420, margin: "0 auto", display: "flex", flexDirection: "column", color: "#4A3A6B" } },
+        askChange && React.createElement("div", { style: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(74,58,107,0.35)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 24 } },
+          React.createElement("div", { style: { background: "#fff", borderRadius: 20, padding: 24, maxWidth: 320, width: "100%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.25)" } },
+            React.createElement("div", { style: { fontSize: 40, marginBottom: 8 } }, "🐾"),
+            React.createElement("h2", { style: { fontSize: 18, fontWeight: 700, color: "#4A3A6B", marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, "Cambiare animale?"),
+            React.createElement("p", { style: { fontSize: 12, color: "#8F84B0", marginBottom: 20, lineHeight: 1.5 } }, "Tornerai alla scelta dell'animale. I progressi di " + animal.name + " restano salvati e li ritrovi se lo riscegli."),
+            React.createElement("div", { style: { display: "flex", gap: 10 } },
+              React.createElement("button", { onClick: () => setAskChange(false), style: { flex: 1, background: "rgba(180,165,214,0.15)", color: "#8F84B0", border: "none", borderRadius: 14, padding: "12px 0", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Quicksand', sans-serif" } }, "No"),
+              React.createElement("button", { onClick: () => { try { localStorage.removeItem("pet-animal"); } catch (e) {} setAskChange(false); setAnimal(null); setTab("home"); }, style: { flex: 1, background: "linear-gradient(135deg, #FFC53D, #FFD966)", color: "#4A3A6B", border: "none", borderRadius: 14, padding: "12px 0", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Quicksand', sans-serif" } }, "Sì")
+            )
+          )
+        ),
+        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 18px 10px", background: "rgba(255, 255, 255, 0.7)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255, 255, 255, 0.5)" } },
+          React.createElement("div", null,
+            React.createElement("div", { style: { fontFamily: "'Fredoka', sans-serif", fontSize: 20, fontWeight: 700, color: "#4A3A6B" } }, animal.name),
+            React.createElement("div", { style: { fontSize: 11, color: "#8F84B0" } }, stage.label)
+          ),
+          React.createElement("button", { onClick: () => setAskChange(true), style: { background: "rgba(255,255,255,0.6)", border: "1px solid rgba(180,165,214,0.5)", borderRadius: 12, padding: "8px 12px", fontSize: 11, fontWeight: 700, color: "#8F5FC7", cursor: "pointer", fontFamily: "'Quicksand', sans-serif" } }, "Cambia")
+        ),
+        React.createElement("div", { style: { flex: 1, background: "rgba(255, 255, 255, 0.6)", backdropFilter: "blur(10px)", borderRadius: "24px 24px 0 0", padding: "20px 18px", overflowY: "auto", borderTop: "1px solid rgba(255, 255, 255, 0.8)" } },
+          isDead ? React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", textAlign: "center" } },
+            React.createElement("div", { style: { fontSize: 64, marginBottom: 12 } }, "😔"),
+            React.createElement("h2", { style: { fontSize: 20, fontWeight: 700, color: "#4A3A6B", marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, animal.name + " se ne è andato..."),
+            React.createElement("button", { style: { marginTop: 24, background: "linear-gradient(135deg, #FFC53D, #FFD966)", color: "#4A3A6B", border: "none", borderRadius: 18, padding: "11px 28px", fontWeight: 700, cursor: "pointer", fontFamily: "'Quicksand', sans-serif" }, onClick: () => { setAnimal(null); saveProfile(null); } }, "Ricominciare")
+          ) : tab === "home" ? React.createElement(Home, { profile, stage, animal }) : tab === "traguardi" ? React.createElement(Traguardi, { profile, setProfile: saveProfile }) : tab === "cucina" ? React.createElement(CucinaSalute, { profile, setProfile: saveProfile }) : React.createElement(Statistiche, { profile })
+        ),
+        !isDead && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", background: "rgba(255, 255, 255, 0.7)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255, 255, 255, 0.5)", padding: "6px 10px 10px", gap: 4 } },
+          React.createElement("button", { onClick: () => setTab("home"), style: { background: tab === "home" ? "#FFE070" : "transparent", color: tab === "home" ? "#4A3A6B" : "#B3A5D6", border: "none", borderRadius: 10, padding: "8px 0", cursor: "pointer", fontWeight: tab === "home" ? 700 : 500, fontFamily: "'Quicksand', sans-serif", fontSize: 11 } }, "Casa"),
+          React.createElement("button", { onClick: () => setTab("traguardi"), style: { background: tab === "traguardi" ? "#FFE070" : "transparent", color: tab === "traguardi" ? "#4A3A6B" : "#B3A5D6", border: "none", borderRadius: 10, padding: "8px 0", cursor: "pointer", fontWeight: tab === "traguardi" ? 700 : 500, fontFamily: "'Quicksand', sans-serif", fontSize: 11 } }, "Traguardi"),
+          React.createElement("button", { onClick: () => setTab("cucina"), style: { background: tab === "cucina" ? "#FFE070" : "transparent", color: tab === "cucina" ? "#4A3A6B" : "#B3A5D6", border: "none", borderRadius: 10, padding: "8px 0", cursor: "pointer", fontWeight: tab === "cucina" ? 700 : 500, fontFamily: "'Quicksand', sans-serif", fontSize: 11 } }, "Cucina"),
+          React.createElement("button", { onClick: () => setTab("stats"), style: { background: tab === "stats" ? "#FFE070" : "transparent", color: tab === "stats" ? "#4A3A6B" : "#B3A5D6", border: "none", borderRadius: 10, padding: "8px 0", cursor: "pointer", fontWeight: tab === "stats" ? 700 : 500, fontFamily: "'Quicksand', sans-serif", fontSize: 11 } }, "Stats")
+        )
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(CucciolataApp));
+  </script>
+
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</body>
+</html>
