@@ -1,0 +1,32 @@
+{
+  "name": "Cucciolo - Il Tuo Compagno di Crescita",
+  "short_name": "Cucciolo",
+  "description": "Un Ragdoll che cresce con i tuoi traguardi. Prendersi cura del cucciolo significa prendersi cura di te.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#FFEAF7",
+  "background_color": "#FFFFFF",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23FFEAF7' width='192' height='192'/><text x='50%' y='50%' font-size='120' text-anchor='middle' dominant-baseline='middle'>🐱</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23FFEAF7' width='512' height='512'/><text x='50%' y='50%' font-size='320' text-anchor='middle' dominant-baseline='middle'>🐱</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "productivity"],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='url(%23grad)' width='540' height='720'/><defs><linearGradient id='grad'><stop offset='0%' stop-color='%23FFEAF7'/><stop offset='100%' stop-color='%23E3F6FF'/></linearGradient></defs><text x='270' y='300' font-size='120' text-anchor='middle' dominant-baseline='middle'>🐱</text><text x='270' y='400' font-size='24' text-anchor='middle' fill='%234A3A6B'>Cucciolo</text></svg>",
+      "sizes": "540x720",
+      "form_factor": "narrow"
+    }
+  ]
+}
