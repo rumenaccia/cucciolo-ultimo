@@ -940,7 +940,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
       return "da " + anni + (anni === 1 ? " anno" : " anni") + (restoM ? " e " + restoM + "m" : "");
     }
 
-    function Impostazioni({ profile, animal, cambiaTema, resetCucciolo, T, cloudUser, onGoogleLogin, onSignOut, accessoInCorso }) {
+    function Impostazioni({ profile, animal, cambiaTema, resetCucciolo, T, setProfile, cloudUser, onGoogleLogin, onSignOut, accessoInCorso }) {
       const [confermaReset, setConfermaReset] = useState(false);
       const [nomeDigitato, setNomeDigitato] = useState("");
       const temaAttuale = profile.tema || "rosa";
