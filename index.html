@@ -70,6 +70,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc, onSnapshot }
       from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAeofl_uWBxn7gU43s7aCqZoEYyHlEQQTM",
@@ -82,6 +83,9 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+getRedirectResult(auth).catch(() => {});
 
     // Rendo disponibili all'app tre funzioni semplici
     window.cloud = {
@@ -100,8 +104,13 @@
       ascolta: (codice, quandoCambia) => {
         try { return onSnapshot(doc(db, "cuccioli", codice), s => { if (s.exists()) quandoCambia(s.data()); }); }
         catch (e) { console.log("ascolta:", e); return () => {}; }
-      }
-    };
+      },
+accediGoogle: () => { try { signInWithRedirect(auth, provider); } catch (e) { console.log("accediGoogle:", e); } },
+esci: async () => { try { await signOut(auth); return true; } catch (e) { console.log("esci:", e); return false; } },
+onUtente: (cb) => onAuthStateChanged(auth, cb),
+salvaAccount: async (uid, dati) => { try { await setDoc(doc(db, "utenti", uid), dati); return true; } catch (e) { console.log("salvaAccount:", e); return false; } },
+leggiAccount: async (uid) => { try { const s = await getDoc(doc(db, "utenti", uid)); return s.exists() ? s.data() : null; } catch (e) { console.log("leggiAccount:", e); return null; } }
+};
     window.dispatchEvent(new Event("cloud-pronto"));
   </script>
 
@@ -205,8 +214,8 @@
       return base + "-" + coda;
     }
 
-    function Login({ onDone }) {
-      const [mioNome, setMioNome] = useState("");
+    function Login({ onDone, onGoogleLogin, accessoInCorso, nomeGoogle }) {
+      const [mioNome, setMioNome] = useState(nomeGoogle || "");
       const [nomeCucciolo, setNomeCucciolo] = useState("");
       const [codiceAmico, setCodiceAmico] = useState("");
 
@@ -219,6 +228,8 @@
         React.createElement("div", { style: { fontSize: 52, marginBottom: 10 } }, "🐾"),
         React.createElement("h1", { style: { fontSize: 26, marginBottom: 6, color: "#4A3A6B", fontWeight: 700, fontFamily: "'Fredoka', sans-serif" } }, "Benvenuta in Cucciolo"),
         React.createElement("p", { style: { fontSize: 12, color: "#8F84B0", marginBottom: 24, lineHeight: 1.5 } }, "Un compagno che vive 20 anni insieme a te."),
+React.createElement("button", { onClick: onGoogleLogin, disabled: accessoInCorso, style: { width: "100%", maxWidth: 340, background: "#ffffff", color: "#4A3A6B", border: "1px solid rgba(74,58,107,0.25)", borderRadius: 14, padding: "13px", fontWeight: 700, fontSize: 14, cursor: accessoInCorso ? "default" : "pointer", marginBottom: 14 } }, accessoInCorso ? "Accesso in corso…" : "🔵 Accedi con Google"),
+React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBottom: 18 } }, "— oppure crea il profilo manualmente —"),
 
         React.createElement("div", { style: { width: "100%", maxWidth: 340 } },
           React.createElement("label", { style: stileLabel }, "Il tuo nome"),
@@ -437,16 +448,6 @@
             React.createElement("div", { style: { fontSize: 18 } }, type.emoji),
             React.createElement("div", null, type.label)
           ))
-        ),
-        tragNascosti.length > 0 && React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 12, marginBottom: 12, border: "1px solid " + T.bordo } },
-          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Nascosti — tocca per rimettere"),
-          React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 } },
-            tragNascosti.map(key => {
-              const t = MILESTONE_TUTTI[key];
-              if (!t) return null;
-              return React.createElement("button", { key: key, onClick: () => setProfile({ ...profile, traguardiNascosti: tragNascosti.filter(x => x !== key) }), style: { background: "transparent", border: "1px solid " + T.bordo, borderRadius: 8, padding: "6px 10px", fontSize: 12, color: T.testo, cursor: "pointer" } }, t.emoji + " " + t.label + " ＋");
-            })
-          )
         ),
         // Form aggiungi traguardo personalizzato
         React.createElement(FormTraguardo, { profile, setProfile, T }),
@@ -743,17 +744,6 @@
           React.createElement("div", { style: { fontSize: 11, color: T.tenue, lineHeight: 1.6 } }, "Un mese intero senza fumare: +1 anno di vita. Una settimana senza bere: +1 anno di vita.")
         ),
 
-        nascosti.length > 0 && React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 12, marginBottom: 16, border: "1px solid " + T.bordo } },
-          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Nascosti — tocca per rimettere"),
-          React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 } },
-            nascosti.map(tipo => {
-              const t = TUTTI[tipo];
-              if (!t) return null;
-              return React.createElement("button", { key: tipo, onClick: () => setProfile({ ...profile, viziNascosti: nascosti.filter(x => x !== tipo) }), style: { background: "transparent", border: "1px solid " + T.bordo, borderRadius: 8, padding: "6px 10px", fontSize: 12, color: T.testo, cursor: "pointer" } }, t.emoji + " " + t.label + " ＋");
-            })
-          )
-        ),
-
         React.createElement("h2", { style: { fontSize: 15, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "Calendario"),
         storico.length === 0
           ? React.createElement("p", { style: { fontSize: 12, color: T.tenue } }, "Ancora niente da segnare.")
@@ -950,11 +940,17 @@
       return "da " + anni + (anni === 1 ? " anno" : " anni") + (restoM ? " e " + restoM + "m" : "");
     }
 
-    function Impostazioni({ profile, animal, cambiaTema, resetCucciolo, T }) {
+    function Impostazioni({ profile, animal, cambiaTema, resetCucciolo, T, cloudUser, onGoogleLogin, onSignOut, accessoInCorso }) {
       const [confermaReset, setConfermaReset] = useState(false);
       const [nomeDigitato, setNomeDigitato] = useState("");
       const temaAttuale = profile.tema || "rosa";
       const nomeCucc = profile.nomeCucciolo || profile.petName || "";
+const milestonePersonali_S = profile.traguardiPersonali || {};
+const MILESTONE_TUTTI_S = Object.assign({}, MILESTONE_TYPES, milestonePersonali_S);
+const tragNascosti_S = profile.traguardiNascosti || [];
+const viziPersonali_S = profile.viziPersonali || {};
+const VIZI_TUTTI_S = Object.assign({}, VIZI_TIPI, viziPersonali_S);
+const viziNascosti_S = profile.viziNascosti || [];
 
       return React.createElement("div", { style: { padding: "4px 4px" } },
         React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "Impostazioni ⚙️"),
@@ -966,7 +962,20 @@
           React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginTop: 2 } }, tempoInsieme(profile.dataInizio))
         ),
 
-        // Temi
+        // Account Google
+React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo, textAlign: "center" } },
+cloudUser
+? React.createElement("div", null,
+React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 8 } }, "Collegata come " + (cloudUser.displayName || cloudUser.email || "account Google")),
+React.createElement("button", { onClick: onSignOut, style: { background: "transparent", color: T.accento, border: "1px solid " + T.bordo, borderRadius: 10, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "Esci dall'account")
+)
+: React.createElement("div", null,
+React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 8 } }, "Collega un account Google per non perdere mai il tuo cucciolo"),
+React.createElement("button", { onClick: onGoogleLogin, disabled: accessoInCorso, style: { background: "#ffffff", color: T.testo, border: "1px solid " + T.bordo, borderRadius: 10, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: accessoInCorso ? "default" : "pointer" } }, accessoInCorso ? "Accesso in corso…" : "🔵 Accedi con Google")
+)
+),
+
+// Temi
         React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
           React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "Tema colore"),
           React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(72px, 1fr))", gap: 8 } },
@@ -981,7 +990,31 @@
           )
         ),
 
-        // Guida: come funziona
+(tragNascosti_S.length > 0 || viziNascosti_S.length > 0) && React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
+React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "Nascosti — tocca per rimettere"),
+tragNascosti_S.length > 0 && React.createElement("div", { style: { marginBottom: viziNascosti_S.length > 0 ? 10 : 0 } },
+React.createElement("div", { style: { fontSize: 10, color: T.tenue, marginBottom: 6 } }, "Traguardi"),
+React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 } },
+tragNascosti_S.map(key => {
+const t = MILESTONE_TUTTI_S[key];
+if (!t) return null;
+return React.createElement("button", { key: "tg_" + key, onClick: () => setProfile({ ...profile, traguardiNascosti: tragNascosti_S.filter(x => x !== key) }), style: { background: "transparent", border: "1px solid " + T.bordo, borderRadius: 8, padding: "6px 10px", fontSize: 12, color: T.testo, cursor: "pointer" } }, t.emoji + " " + t.label + " ＋");
+})
+)
+),
+viziNascosti_S.length > 0 && React.createElement("div", null,
+React.createElement("div", { style: { fontSize: 10, color: T.tenue, marginBottom: 6 } }, "Vizi & Sfizi"),
+React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 } },
+viziNascosti_S.map(tipo => {
+const t = VIZI_TUTTI_S[tipo];
+if (!t) return null;
+return React.createElement("button", { key: "vz_" + tipo, onClick: () => setProfile({ ...profile, viziNascosti: viziNascosti_S.filter(x => x !== tipo) }), style: { background: "transparent", border: "1px solid " + T.bordo, borderRadius: 8, padding: "6px 10px", fontSize: 12, color: T.testo, cursor: "pointer" } }, t.emoji + " " + t.label + " ＋");
+})
+)
+)
+),
+
+// Guida: come funziona
         React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
           React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "Come funziona 📖"),
           [
@@ -1030,6 +1063,8 @@
       const [datiLogin, setDatiLogin] = useState(null);   // nomi + codice, dal login
       const [amiciDati, setAmiciDati] = useState({});   // dati dei cuccioli amici, per codice
       const [statoCloud, setStatoCloud] = useState("attesa"); // attesa | ok | offline
+const [cloudUser, setCloudUser] = useState(null); // utente Google collegato, se presente
+const [accessoInCorso, setAccessoInCorso] = useState(false);
 
       useEffect(() => {
         try {
@@ -1151,7 +1186,69 @@
         try { localStorage.setItem("pet-profile", JSON.stringify(p)); } catch (e) {}
       }, []);
 
-      const completaLogin = (dati) => {
+// Resto in ascolto di chi e' collegato con Google
+useEffect(() => {
+let off = () => {};
+const setup = () => {
+if (window.cloud && window.cloud.onUtente) {
+off = window.cloud.onUtente(u => { setCloudUser(u); setAccessoInCorso(false); });
+}
+};
+if (window.cloud && window.cloud.pronto) setup();
+else window.addEventListener("cloud-pronto", setup);
+return () => { window.removeEventListener("cloud-pronto", setup); off(); };
+}, []);
+
+// Se sono collegata con Google e non ho ancora un cucciolo su questo telefono, lo recupero dal mio account
+useEffect(() => {
+if (statoCloud !== "ok" || !loaded || !cloudUser) return;
+if (profile) return;
+let annullato = false;
+window.cloud.leggiAccount(cloudUser.uid).then(dati => {
+if (annullato || !dati || !dati.backupProfilo) return;
+try {
+const p = JSON.parse(dati.backupProfilo);
+const a = dati.backupAnimale ? JSON.parse(dati.backupAnimale) : null;
+const l = dati.backupLogin ? JSON.parse(dati.backupLogin) : null;
+setProfile(prev => {
+if (prev) return prev;
+try {
+localStorage.setItem("pet-profile", JSON.stringify(p));
+if (a) localStorage.setItem("pet-animal", JSON.stringify(a));
+if (l) localStorage.setItem("pet-login", JSON.stringify(l));
+} catch (e) {}
+return p;
+});
+if (a) setAnimal(prev => prev || a);
+if (l) setDatiLogin(prev => prev || l);
+} catch (e) {}
+});
+return () => { annullato = true; };
+}, [statoCloud, loaded, profile, cloudUser]);
+
+// Ogni volta che il mio cucciolo cambia, se sono collegata con Google salvo anche li' il backup
+useEffect(() => {
+if (statoCloud !== "ok" || !profile || !animal || !cloudUser) return;
+window.cloud.salvaAccount(cloudUser.uid, {
+backupProfilo: JSON.stringify(profile),
+backupAnimale: JSON.stringify(animal),
+backupLogin: JSON.stringify(datiLogin),
+aggiornato: new Date().toISOString(),
+});
+}, [statoCloud, profile, animal, cloudUser, datiLogin]);
+
+const accediConGoogle = () => {
+if (!window.cloud || !window.cloud.accediGoogle) return;
+setAccessoInCorso(true);
+window.cloud.accediGoogle();
+};
+
+const disconnettiGoogle = async () => {
+if (window.cloud && window.cloud.esci) await window.cloud.esci();
+setCloudUser(null);
+};
+
+const completaLogin = (dati) => {
         const codice = generaCodice(dati.nomeCucciolo);
         const login = { ...dati, codice };
         setDatiLogin(login);
@@ -1188,7 +1285,7 @@
       };
 
       if (!loaded) return React.createElement("div");
-      if (!datiLogin) return React.createElement(Login, { onDone: completaLogin });
+      if (!datiLogin) return React.createElement(Login, { onDone: completaLogin, onGoogleLogin: accediConGoogle, accessoInCorso, nomeGoogle: cloudUser ? (cloudUser.displayName || "") : "" });
       if (!animal) return React.createElement(AnimalSelector, { onSelect: selectAnimal });
       if (!profile) return React.createElement(AnimalSelector, { onSelect: selectAnimal });
 
@@ -1224,7 +1321,7 @@
             React.createElement("div", { style: { fontSize: 64, marginBottom: 12 } }, "😔"),
             React.createElement("h2", { style: { fontSize: 20, fontWeight: 700, color: T.testo, marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, animal.name + " se ne è andato..."),
             React.createElement("button", { style: { marginTop: 24, background: T.accento, color: T.suAccento, border: "none", borderRadius: 18, padding: "11px 28px", fontWeight: 700, cursor: "pointer", fontFamily: "'Quicksand', sans-serif" }, onClick: () => { setAnimal(null); saveProfile(null); } }, "Ricominciare")
-          ) : tab === "home" ? React.createElement(Home, { profile, stage, animal, T }) : tab === "traguardi" ? React.createElement(Traguardi, { profile, setProfile: saveProfile, T }) : tab === "vizi" ? React.createElement(ViziSfizi, { profile, setProfile: saveProfile, T }) : tab === "amico" ? React.createElement(Amico, { profile, amiciDati, statoCloud, setProfile: saveProfile, T }) : tab === "impostazioni" ? React.createElement(Impostazioni, { profile, animal, cambiaTema, resetCucciolo, T }) : React.createElement(Statistiche, { profile, T })
+          ) : tab === "home" ? React.createElement(Home, { profile, stage, animal, T }) : tab === "traguardi" ? React.createElement(Traguardi, { profile, setProfile: saveProfile, T }) : tab === "vizi" ? React.createElement(ViziSfizi, { profile, setProfile: saveProfile, T }) : tab === "amico" ? React.createElement(Amico, { profile, amiciDati, statoCloud, setProfile: saveProfile, T }) : tab === "impostazioni" ? React.createElement(Impostazioni, { profile, animal, cambiaTema, resetCucciolo, T, setProfile: saveProfile, cloudUser, onGoogleLogin: accediConGoogle, onSignOut: disconnettiGoogle, accessoInCorso }) : React.createElement(Statistiche, { profile, T })
         ),
         !isDead && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(5, 1fr)", background: T.tinta, borderTop: "1px solid " + T.bordo, padding: "10px 8px 16px", gap: 5, flexShrink: 0 } },
           ["home","traguardi","vizi","amico","stats"].map((id, i) => React.createElement("button", { key: id, onClick: () => setTab(id), style: { background: tab === id ? T.accento : T.cardSoft, color: tab === id ? T.suAccento : T.tenue, border: "1px solid " + (tab === id ? T.accento : T.bordo), borderRadius: 12, padding: "12px 0", cursor: "pointer", fontWeight: tab === id ? 700 : 600, fontFamily: "'Quicksand', sans-serif", fontSize: i >= 3 ? 10 : 11 } }, ["Casa","Traguardi","Vizi","Amico","Stats"][i]))
