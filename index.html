@@ -617,10 +617,10 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
           ? React.createElement("p", { style: { fontSize: 12, color: T.tenue } }, "Nessun traguardo ancora.")
           : React.createElement(SettimanaCalendario, {
               voci: (profile.milestones || []).map(m => Object.assign({}, m, { data: m.date })),
-              emojiDi: (m) => (MILESTONE_TYPES[m.type] || (profile.traguardiPersonali || {})[m.type] || { emoji: "•" }).emoji,
+              emojiDi: (m) => m.type === "promemoria" ? (m.promEmoji || "💊") : (MILESTONE_TYPES[m.type] || (profile.traguardiPersonali || {})[m.type] || { emoji: "•" }).emoji,
               etichettaDi: (m) => {
-                const info = MILESTONE_TYPES[m.type] || (profile.traguardiPersonali || {})[m.type] || { label: "Traguardo" };
-                const dett = m.type === "esame" ? ("voto " + m.gradeLabel) : (m.amount + " " + (m.unitLabel || ""));
+                const info = m.type === "promemoria" ? { label: (m.promNome || "Promemoria") } : (MILESTONE_TYPES[m.type] || (profile.traguardiPersonali || {})[m.type] || { label: "Traguardo" });
+                const dett = m.type === "esame" ? ("voto " + m.gradeLabel) : (m.type === "promemoria" ? "fatto" : (m.amount + " " + (m.unitLabel || "")));
                 return info.label + "  (" + dett + ")";
               },
               T: T,
@@ -1054,6 +1054,8 @@ return gg + "/" + mm + "/" + d.getFullYear();
 
 function Salute({ profile, setProfile, T }) {
 const [giornoCiclo, setGiornoCiclo] = useState(dataInputOggi());
+      const cicloNascosto = !!profile.cicloNascosto;
+      const toggleCiclo = () => setProfile({ ...profile, cicloNascosto: !profile.cicloNascosto });
 const [nomeProm, setNomeProm] = useState("");
 const [emojiProm, setEmojiProm] = useState("💊");
 const [intervalloProm, setIntervalloProm] = useState("1");
@@ -1088,7 +1090,11 @@ setProfile({ ...profile, promemoria: [...promemoria, nuovo] });
 setNomeProm(""); setIntervalloProm("1"); setEmojiProm("💊");
 };
 const segnaFatto = (id) => {
-setProfile({ ...profile, promemoria: promemoria.map(p => p.id === id ? { ...p, ultima: new Date().toISOString() } : p) });
+const p = promemoria.find(x => x.id === id);
+if (!p) return;
+const iso = new Date().toISOString();
+const milestone = { id: uid(), type: "promemoria", promNome: p.nome, promEmoji: p.emoji, amount: 1, unitLabel: "volta", points: 10, vita: GIORNI_SETTIMANA, date: iso };
+setProfile({ ...profile, promemoria: promemoria.map(x => x.id === id ? { ...x, ultima: iso } : x), points: (profile.points || 0) + 10, vitaDays: Math.max(0, (profile.vitaDays || 0) + GIORNI_SETTIMANA), milestones: [milestone, ...(profile.milestones || [])] });
 };
 const cancellaPromemoria = (id) => {
 setProfile({ ...profile, promemoria: promemoria.filter(p => p.id !== id) });
@@ -1101,6 +1107,46 @@ if (giorni === 1) return { testo: "Domani", colore: "#FFB020" };
 return { testo: "Tra " + giorni + " giorni", colore: T.tenue };
 };
 
+const [permessoNotifiche, setPermessoNotifiche] = useState(
+  (typeof Notification !== "undefined") ? Notification.permission : "unsupported"
+);
+const attivaNotifiche = () => {
+  if (typeof Notification === "undefined") { alert("Le notifiche non sono supportate su questo dispositivo/browser. Su iPhone aggiungi prima l'app alla schermata Home."); return; }
+  Notification.requestPermission().then((perm) => {
+    setPermessoNotifiche(perm);
+    if (perm === "granted") {
+      inviaNotifica("ViceVersa 🐱", "Notifiche attivate! Ti avviserò quando un promemoria è da fare.");
+    }
+  });
+};
+const inviaNotifica = (titolo, corpo) => {
+  try {
+    if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
+    if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+      navigator.serviceWorker.ready.then((reg) => {
+        reg.showNotification(titolo, { body: corpo, icon: "/manifest.json", tag: "viceversa-prom", badge: "/manifest.json" });
+      }).catch(() => { try { new Notification(titolo, { body: corpo }); } catch(e) {} });
+    } else {
+      try { new Notification(titolo, { body: corpo }); } catch(e) {}
+    }
+  } catch (e) {}
+};
+useEffect(() => {
+  if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
+  const oggiKey = new Date().toISOString().slice(0, 10);
+  const dovuti = promemoria.filter((p) => {
+    const prossima = new Date(new Date(p.ultima).getTime() + p.giorni * 24 * 60 * 60 * 1000);
+    const g = Math.ceil((prossima - new Date()) / (1000 * 60 * 60 * 24));
+    return g <= 0;
+  });
+  dovuti.forEach((p) => {
+    const chiave = "vv_notif_" + p.id + "_" + oggiKey;
+    if (localStorage.getItem(chiave)) return;
+    inviaNotifica(p.emoji + " " + p.nome, "È il momento: " + p.nome + ". Apri ViceVersa e segna \"Fatto\".");
+    localStorage.setItem(chiave, "1");
+  });
+}, [promemoria, permessoNotifiche]);
+
 const stileCard = { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo };
 const stileInput = { padding: "8px 10px", borderRadius: 8, border: "1px solid " + T.bordo, fontSize: 12, background: T.scuro ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)", color: T.testo };
 
@@ -1109,18 +1155,21 @@ React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 
 React.createElement("p", { style: { fontSize: 12, color: T.tenue, marginBottom: 12 } }, "Il ciclo e i tuoi impegni ricorrenti, come le medicine."),
 
 React.createElement("div", { style: stileCard },
-React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "🩸 Ciclo"),
-ultimoCiclo
+React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 } },
+React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: T.testo } }, "🩸 Ciclo"),
+React.createElement("button", { onClick: toggleCiclo, style: { background: "transparent", border: "1px solid " + T.bordo, color: T.tenue, borderRadius: 8, padding: "4px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer" } }, cicloNascosto ? "Mostra" : "Nascondi")
+),
+(!cicloNascosto && (ultimoCiclo
 ? React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 6 } }, "Ultimo inizio: " + formatGiornoBreve(ultimoCiclo))
-: React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 6 } }, "Nessun ciclo registrato ancora."),
-prossimoCiclo && React.createElement("div", { style: { fontSize: 12, color: T.accento, fontWeight: 700, marginBottom: 10 } },
+: React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 6 } }, "Nessun ciclo registrato ancora."))),
+!cicloNascosto && prossimoCiclo && React.createElement("div", { style: { fontSize: 12, color: T.accento, fontWeight: 700, marginBottom: 10 } },
 "Stima prossimo: " + formatGiornoBreve(prossimoCiclo.toISOString()) + " (" + (giorniAlProssimo >= 0 ? "tra " + giorniAlProssimo + " giorni" : "in ritardo di " + Math.abs(giorniAlProssimo) + " giorni") + ")"
 ),
-React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 10 } },
+!cicloNascosto && React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 10 } },
 React.createElement("input", { type: "date", value: giornoCiclo, max: dataInputOggi(), onChange: e => setGiornoCiclo(e.target.value || dataInputOggi()), style: stileInput }),
 React.createElement("button", { onClick: registraCiclo, style: { background: T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "＋ Registra inizio ciclo")
 ),
-cicli.length > 0 && React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
+!cicloNascosto && cicli.length > 0 && React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
 cicli.slice(0, 6).map(iso => React.createElement("div", { key: iso, style: { display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 11, color: T.tenue } },
 React.createElement("span", null, formatGiornoBreve(iso)),
 React.createElement("span", { onClick: () => cancellaCiclo(iso), style: { cursor: "pointer", color: T.tenue } }, "×")
@@ -1131,6 +1180,13 @@ React.createElement("span", { onClick: () => cancellaCiclo(iso), style: { cursor
 React.createElement("div", { style: stileCard },
 React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "💊 Promemoria"),
 React.createElement("p", { style: { fontSize: 11, color: T.tenue, marginBottom: 10 } }, "Per impegni che si ripetono nel tempo, come le medicine. Ti avvisa qui nell'app quando è il momento."),
+React.createElement("div", { style: { marginBottom: 10 } },
+  permessoNotifiche === "granted"
+    ? React.createElement("div", { style: { fontSize: 10, color: T.accento, fontWeight: 700 } }, "🔔 Notifiche attive")
+    : (permessoNotifiche === "denied"
+      ? React.createElement("div", { style: { fontSize: 10, color: T.tenue } }, "🔕 Notifiche bloccate. Abilitale dalle impostazioni del browser/telefono.")
+      : React.createElement("button", { onClick: attivaNotifiche, style: { background: T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer" } }, "🔔 Attiva notifiche"))
+),
 promemoria.length === 0
 ? React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 10 } }, "Nessun promemoria ancora.")
 : React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 } },
