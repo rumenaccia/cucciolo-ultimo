@@ -159,13 +159,24 @@ leggiAccount: async (uid) => { try { const s = await getDoc(doc(db, "utenti", ui
     };
 
     // Somma di quanto già fatto OGGI per un certo tipo di traguardo
-    function fattoOggi(milestones, tipo) {
-      const oggi = new Date();
+    function fattoOggi(milestones, tipo, riferimentoIso) {
+      const oggi = riferimentoIso ? new Date(riferimentoIso) : new Date();
       const stessoGiorno = (iso) => {
         const d = new Date(iso);
         return d.getFullYear() === oggi.getFullYear() && d.getMonth() === oggi.getMonth() && d.getDate() === oggi.getDate();
       };
       return (milestones || []).filter(m => m.type === tipo && stessoGiorno(m.date)).reduce((s, m) => s + (m.amount || 0), 0);
+    }
+
+    function dataInputOggi() {
+      const d = new Date();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const gg = String(d.getDate()).padStart(2, "0");
+      return d.getFullYear() + "-" + mm + "-" + gg;
+    }
+    function isoDaGiorno(giornoStr) {
+      if (!giornoStr || giornoStr === dataInputOggi()) return new Date().toISOString();
+      return new Date(giornoStr + "T12:00:00").toISOString();
     }
 
     const RECIPES = [
@@ -389,6 +400,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
       const [inputValue, setInputValue] = useState("");
       const [examGrade, setExamGrade] = useState("");
       const [avviso, setAvviso] = useState("");
+      const [giornoScelto, setGiornoScelto] = useState(dataInputOggi());
 
       const handleAdd = (typeKey) => {
         const type = MILESTONE_TYPES[typeKey];
@@ -399,7 +411,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         if (type.max != null && val > type.max) { setAvviso("Massimo " + type.max + " " + type.unit + " per volta"); return; }
         // tetto giornaliero
         if (type.maxGiorno != null) {
-          const giaOggi = fattoOggi(profile.milestones, typeKey);
+          const giaOggi = fattoOggi(profile.milestones, typeKey, isoDaGiorno(giornoScelto));
           if (giaOggi + val > type.maxGiorno) {
             const resto = Math.max(0, type.maxGiorno - giaOggi);
             setAvviso(resto === 0 ? "Hai già raggiunto il massimo di oggi" : "Oggi puoi aggiungere ancora " + resto + " " + type.unit);
@@ -407,7 +419,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
           }
         }
         const points = Math.floor(val * type.perUnit);
-        const milestone = { id: uid(), type: typeKey, amount: val, unitLabel: type.unit, points, vita: GIORNI_SETTIMANA, date: new Date().toISOString() };
+        const milestone = { id: uid(), type: typeKey, amount: val, unitLabel: type.unit, points, vita: GIORNI_SETTIMANA, date: isoDaGiorno(giornoScelto) };
         const newProfile = { ...profile, points: profile.points + points, vitaDays: Math.min(MAX_VITA_DAYS, profile.vitaDays + GIORNI_SETTIMANA), milestones: [milestone, ...(profile.milestones || [])] };
         setProfile(newProfile);
         setInputValue("");
@@ -419,7 +431,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         if (!examGrade) return;
         const g = EXAM_GRADES.find(x => x.label === examGrade);
         if (!g) return;
-        const milestone = { id: uid(), type: "esame", gradeLabel: g.label, vita: g.vita, points: g.points, date: new Date().toISOString() };
+        const milestone = { id: uid(), type: "esame", gradeLabel: g.label, vita: g.vita, points: g.points, date: isoDaGiorno(giornoScelto) };
         const newProfile = {
           ...profile,
           points: Math.max(0, profile.points + g.points),
@@ -438,7 +450,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
 
       const handleAddPersonale = (typeKey) => {
         const type = MILESTONE_TUTTI[typeKey];
-        const milestone = { id: uid(), type: typeKey, amount: 1, unitLabel: "volta", points: 10, vita: Math.abs(type.vita || GIORNI_SETTIMANA), date: new Date().toISOString() };
+        const milestone = { id: uid(), type: typeKey, amount: 1, unitLabel: "volta", points: 10, vita: Math.abs(type.vita || GIORNI_SETTIMANA), date: isoDaGiorno(giornoScelto) };
         const nuovaVita = (type.vita || GIORNI_SETTIMANA);
         const newProfile = { ...profile, points: profile.points + 10, vitaDays: Math.max(0, Math.min(MAX_VITA_DAYS, profile.vitaDays + nuovaVita)), milestones: [milestone, ...(profile.milestones || [])] };
         setProfile(newProfile);
@@ -460,6 +472,12 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
       return React.createElement("div", { style: { padding: "4px 4px" } },
         React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "I tuoi traguardi"),
         React.createElement("p", { style: { fontSize: 12, color: T.tenue, marginBottom: 12 } }, "Studio, sonno, esami, igiene, allenamento."),
+        React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 10, marginBottom: 12, border: "1px solid " + T.bordo, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" } },
+          React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: T.testo } }, "Quando?"),
+          React.createElement("input", { type: "date", value: giornoScelto, max: dataInputOggi(), onChange: e => setGiornoScelto(e.target.value || dataInputOggi()), style: { padding: "6px 8px", borderRadius: 8, border: "1px solid " + T.bordo, fontSize: 12, background: T.scuro ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)", color: T.testo } }),
+          giornoScelto !== dataInputOggi() && React.createElement("button", { onClick: () => setGiornoScelto(dataInputOggi()), style: { background: "transparent", border: "1px solid " + T.bordo, borderRadius: 8, padding: "5px 10px", fontSize: 11, color: T.accento, cursor: "pointer" } }, "Torna a oggi"),
+          giornoScelto !== dataInputOggi() && React.createElement("span", { style: { fontSize: 10, color: T.tenue } }, "Stai registrando un traguardo per un giorno passato")
+        ),
         React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 } },
           Object.entries(MILESTONE_TUTTI).filter(([key]) => !tragNascosti.includes(key)).map(([key, type]) => React.createElement("button", { key, onClick: () => { setActiveType(activeType === key ? null : key); setInputValue(""); setExamGrade(""); setAvviso(""); }, style: { position: "relative", background: activeType === key ? T.accento : T.cardSoft, border: "1px solid " + (activeType === key ? T.accento : T.bordo), borderRadius: 10, padding: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, cursor: "pointer", fontSize: 10, color: activeType === key ? T.suAccento : T.testo, fontWeight: activeType === key ? 700 : 500, fontFamily: "'Quicksand', sans-serif" } },
             React.createElement("span", { onClick: (e) => { e.stopPropagation(); type.personale ? cancellaTraguardo(key) : nascondiTraguardo(key); }, style: { position: "absolute", top: 2, right: 5, color: T.tenue, fontSize: 13 } }, "×"),
@@ -474,7 +492,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         ),
         (activeType && !isExam && MILESTONE_TYPES[activeType]) && (function () {
           const type = MILESTONE_TYPES[activeType];
-          const giaOggi = fattoOggi(profile.milestones, activeType);
+          const giaOggi = fattoOggi(profile.milestones, activeType, isoDaGiorno(giornoScelto));
           const resto = type.maxGiorno != null ? Math.max(0, type.maxGiorno - giaOggi) : null;
           const pieno = resto === 0;
           return React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 12, marginBottom: 16, border: "1px solid rgba(69, 214, 181, 0.3)" } },
@@ -507,7 +525,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         !profile.milestones || profile.milestones.length === 0
           ? React.createElement("p", { style: { fontSize: 12, color: T.tenue } }, "Nessun traguardo ancora.")
           : React.createElement(SettimanaCalendario, {
-              voci: profile.milestones,
+              voci: (profile.milestones || []).map(m => Object.assign({}, m, { data: m.date })),
               emojiDi: (m) => (MILESTONE_TYPES[m.type] || (profile.traguardiPersonali || {})[m.type] || { emoji: "•" }).emoji,
               etichettaDi: (m) => {
                 const info = MILESTONE_TYPES[m.type] || (profile.traguardiPersonali || {})[m.type] || { label: "Traguardo" };
@@ -668,6 +686,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
       const [nuoviMesi, setNuoviMesi] = useState("");
 const [condividiAttivo, setCondividiAttivo] = useState(false);
 const [condividiCon, setCondividiCon] = useState((codiciAmici && codiciAmici[0]) || "");
+      const [giornoScelto, setGiornoScelto] = useState(dataInputOggi());
 
       // Mappa unica: vizi fissi + quelli creati dall'utente
       const personali = profile.viziPersonali || {};
@@ -677,21 +696,21 @@ const [condividiCon, setCondividiCon] = useState((codiciAmici && codiciAmici[0])
       const registra = (tipo) => {
         const t = TUTTI[tipo];
         if (!t) return;
-        const voce = { id: uid(), tipo: tipo, vita: t.vita, data: new Date().toISOString() };
+        const dataEvento = isoDaGiorno(giornoScelto);
+        const voce = { id: uid(), tipo: tipo, vita: t.vita, data: dataEvento };
         const nuovo = {
           ...profile,
           vitaDays: Math.max(0, Math.min(MAX_VITA_DAYS, profile.vitaDays + t.vita)),
           viziLog: [voce, ...(profile.viziLog || [])],
         };
-        if (tipo === "sigaretta") { nuovo.cigarettes = (profile.cigarettes || 0) + 1; nuovo.lastSmoke = voce.data; }
-        if (tipo === "drink")     { nuovo.drinks     = (profile.drinks || 0) + 1;     nuovo.lastDrink = voce.data; }
-        if (tipo === "sesso")     { nuovo.sesso      = (profile.sesso || 0) + 1;      nuovo.lastSesso = voce.data; }
+        if (tipo === "sigaretta") { nuovo.cigarettes = (profile.cigarettes || 0) + 1; if (!profile.lastSmoke || dataEvento >= profile.lastSmoke) nuovo.lastSmoke = dataEvento; }
+        if (tipo === "drink") { nuovo.drinks = (profile.drinks || 0) + 1; if (!profile.lastDrink || dataEvento >= profile.lastDrink) nuovo.lastDrink = dataEvento; }
+        if (tipo === "sesso") { nuovo.sesso = (profile.sesso || 0) + 1; if (!profile.lastSesso || dataEvento >= profile.lastSesso) nuovo.lastSesso = dataEvento; }
         setProfile(nuovo);
-if (condividiAttivo && condividiCon && onCondividi) {
-onCondividi(condividiCon, { id: uid(), tipo: tipo, vita: t.vita, daNome: mioNome || "", data: new Date().toISOString() });
-}
+        if (condividiAttivo && condividiCon && onCondividi) {
+          onCondividi(condividiCon, { id: uid(), tipo: tipo, vita: t.vita, daNome: mioNome || "", data: dataEvento });
+        }
       };
-
       const creaVizio = () => {
         const mesi = parseInt(nuoviMesi, 10);
         if (!nuovoNome.trim() || !nuovaEmoji || !mesi || mesi <= 0) return;
@@ -733,6 +752,13 @@ onCondividi(condividiCon, { id: uid(), tipo: tipo, vita: t.vita, daNome: mioNome
       return React.createElement("div", { style: { padding: "4px 4px" } },
         React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "Vizi & Sfizi"),
         React.createElement("p", { style: { fontSize: 12, color: T.tenue, marginBottom: 12 } }, "Ogni tocco viene segnato con data e ora."),
+
+      React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 10, marginBottom: 12, border: "1px solid " + T.bordo, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" } },
+        React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: T.testo } }, "Quando?"),
+        React.createElement("input", { type: "date", value: giornoScelto, max: dataInputOggi(), onChange: e => setGiornoScelto(e.target.value || dataInputOggi()), style: { padding: "6px 8px", borderRadius: 8, border: "1px solid " + T.bordo, fontSize: 12, background: T.scuro ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)", color: T.testo } }),
+        giornoScelto !== dataInputOggi() && React.createElement("button", { onClick: () => setGiornoScelto(dataInputOggi()), style: { background: "transparent", border: "1px solid " + T.bordo, borderRadius: 8, padding: "5px 10px", fontSize: 11, color: T.accento, cursor: "pointer" } }, "Torna a oggi"),
+        giornoScelto !== dataInputOggi() && React.createElement("span", { style: { fontSize: 10, color: T.tenue } }, "Stai registrando per un giorno passato")
+      ),
 
 codiciAmici && codiciAmici.length > 0 && React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 12, border: "1px solid " + T.bordo, marginBottom: 12, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" } },
 React.createElement("label", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 700, color: T.testo, cursor: "pointer" } },
@@ -797,97 +823,137 @@ condividiAttivo && React.createElement("span", { style: { fontSize: 11, color: T
       );
     }
 
-    function Amico({ profile, amiciDati, statoCloud, setProfile, T }) {
-      const [copiato, setCopiato] = useState(false);
-      const [nuovoCodice, setNuovoCodice] = useState("");
-      const [avviso, setAvviso] = useState("");
+    function Amico({ profile, amiciDati, statoCloud, setProfile, T, onCondividi }) {
+const [copiato, setCopiato] = useState(false);
+const [nuovoCodice, setNuovoCodice] = useState("");
+const [avviso, setAvviso] = useState("");
+const [inviato, setInviato] = useState({});
 
-      // lista amici (converto eventuale vecchio codiceAmico singolo)
-      let codici = profile.codiciAmici || [];
-      if ((!codici || codici.length === 0) && profile.codiceAmico) codici = [profile.codiceAmico];
+// lista amici (converto eventuale vecchio codiceAmico singolo)
+let codici = profile.codiciAmici || [];
+if ((!codici || codici.length === 0) && profile.codiceAmico) codici = [profile.codiceAmico];
 
-      const copia = () => {
-        try {
-          navigator.clipboard.writeText(profile.codice);
-          setCopiato(true);
-          setTimeout(() => setCopiato(false), 1800);
-        } catch (e) {}
-      };
+const copia = () => {
+try {
+navigator.clipboard.writeText(profile.codice);
+setCopiato(true);
+setTimeout(() => setCopiato(false), 1800);
+} catch (e) {}
+};
 
-      const aggiungiAmico = () => {
-        const c = nuovoCodice.trim().toUpperCase();
-        if (!c) return;
-        if (c === profile.codice) { setAvviso("Questo è il tuo codice!"); return; }
-        if (codici.includes(c)) { setAvviso("Amico già collegato"); return; }
-        if (codici.length >= 10) { setAvviso("Massimo 10 amici"); return; }
-        setProfile({ ...profile, codiciAmici: [...codici, c], codiceAmico: undefined });
-        setNuovoCodice(""); setAvviso("");
-      };
+const aggiungiAmico = () => {
+const c = nuovoCodice.trim().toUpperCase();
+if (!c) return;
+if (c === profile.codice) { setAvviso("Questo è il tuo codice!"); return; }
+if (codici.includes(c)) { setAvviso("Amico già collegato"); return; }
+if (codici.length >= 10) { setAvviso("Massimo 10 amici"); return; }
+setProfile({ ...profile, codiciAmici: [...codici, c], codiceAmico: undefined });
+setNuovoCodice(""); setAvviso("");
+};
 
-      const scollega = (c) => {
-        setProfile({ ...profile, codiciAmici: codici.filter(x => x !== c), codiceAmico: undefined });
-      };
+const scollega = (c) => {
+setProfile({ ...profile, codiciAmici: codici.filter(x => x !== c), codiceAmico: undefined });
+};
 
-      const cardAmico = (codice) => {
-        const dati = amiciDati && amiciDati[codice];
-        const animale = dati && ANIMALS.find(a => a.id === dati.animalId);
-        const vitaPerc = dati ? Math.max(0, Math.min(100, ((dati.vitaDays || 0) / MAX_VITA_DAYS) * 100)) : 0;
-        return React.createElement("div", { key: codice, style: { background: T.cardSoft, borderRadius: 14, padding: 14, marginBottom: 10, border: "1px solid " + T.bordo, position: "relative" } },
-          React.createElement("button", { onClick: () => scollega(codice), title: "Scollega", style: { position: "absolute", top: 8, right: 10, background: "transparent", border: "none", color: T.tenue, fontSize: 16, cursor: "pointer" } }, "×"),
-          !dati
-            ? React.createElement("div", { style: { textAlign: "center" } },
-                React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: T.testo, marginBottom: 2 } }, codice),
-                React.createElement("div", { style: { fontSize: 11, color: T.tenue } }, statoCloud === "offline" ? "Server non raggiungibile" : "In attesa… (l'amico deve aprire l'app)")
-              )
-            : React.createElement("div", { style: { textAlign: "center" } },
-                React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginBottom: 4 } }, "Cucciolo di " + (dati.mioNome || "…")),
-                React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: T.testo, marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, dati.nomeCucciolo || "—"),
-                animale && React.createElement("img", { src: animale.img, alt: "", style: { width: "min(130px, 38vw)", height: "min(130px, 38vw)", objectFit: "contain", display: "block", margin: "0 auto 10px" } }),
-                React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 6 } }, stageFor(dati.points || 0).label + " · ⭐ " + (dati.points || 0)),
-                React.createElement("div", { style: { background: T.scuro ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.06)", borderRadius: 10, height: 16, overflow: "hidden", marginBottom: 6 } },
-                  React.createElement("div", { style: { background: vitaPerc > 40 ? T.accento : T.tenue, height: "100%", width: vitaPerc + "%" } })
-                ),
-                React.createElement("div", { style: { fontSize: 10, color: T.tenue } }, "Vita max: " + formatDays(dati.vitaDays || 0)),
-                dati.viziConteggi && React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginTop: 8, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "6px 12px" } },
-                  Object.keys(VIZI_TIPI).filter(tipo => (dati.viziConteggi[tipo] || 0) > 0)
-                    .map(tipo => React.createElement("span", { key: tipo }, VIZI_TIPI[tipo].emoji + " " + dati.viziConteggi[tipo]))
-                )
-              )
-        );
-      };
+const faiInsieme = (codice, tipo) => {
+const t = VIZI_TIPI[tipo];
+if (!t) return;
+const adesso = new Date().toISOString();
+const voce = { id: uid(), tipo: tipo, vita: t.vita, data: adesso, insiemeCon: codice };
+const nuovo = {
+...profile,
+vitaDays: Math.max(0, Math.min(MAX_VITA_DAYS, profile.vitaDays + t.vita)),
+viziLog: [voce, ...(profile.viziLog || [])],
+};
+if (tipo === "sigaretta") { nuovo.cigarettes = (profile.cigarettes || 0) + 1; nuovo.lastSmoke = adesso; }
+if (tipo === "drink") { nuovo.drinks = (profile.drinks || 0) + 1; nuovo.lastDrink = adesso; }
+if (tipo === "sesso") { nuovo.sesso = (profile.sesso || 0) + 1; nuovo.lastSesso = adesso; }
+setProfile(nuovo);
+if (onCondividi) onCondividi(codice, { id: uid(), tipo: tipo, vita: t.vita, daNome: profile.mioNome || "", data: adesso });
+setInviato(prev => ({ ...prev, [codice]: tipo }));
+setTimeout(() => setInviato(prev => ({ ...prev, [codice]: null })), 2200);
+};
 
-      return React.createElement("div", { style: { padding: "4px 4px" } },
-        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "I tuoi amici 👥"),
+const cardAmico = (codice) => {
+const dati = amiciDati && amiciDati[codice];
+const animale = dati && ANIMALS.find(a => a.id === dati.animalId);
+const vitaPerc = dati ? Math.max(0, Math.min(100, ((dati.vitaDays || 0) / MAX_VITA_DAYS) * 100)) : 0;
+const mieVitaPerc = Math.max(0, Math.min(100, ((profile.vitaDays || 0) / MAX_VITA_DAYS) * 100));
+const fattoTipo = inviato[codice];
+return React.createElement("div", { key: codice, style: { background: T.cardSoft, borderRadius: 14, padding: 14, marginBottom: 10, border: "1px solid " + T.bordo, position: "relative" } },
+React.createElement("button", { onClick: () => scollega(codice), title: "Scollega", style: { position: "absolute", top: 8, right: 10, background: "transparent", border: "none", color: T.tenue, fontSize: 16, cursor: "pointer" } }, "×"),
+!dati
+? React.createElement("div", { style: { textAlign: "center" } },
+React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: T.testo, marginBottom: 2 } }, codice),
+React.createElement("div", { style: { fontSize: 11, color: T.tenue } }, statoCloud === "offline" ? "Server non raggiungibile" : "In attesa… (l'amico deve aprire l'app)")
+)
+: React.createElement("div", { style: { textAlign: "center" } },
+React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginBottom: 4 } }, "Cucciolo di " + (dati.mioNome || "…")),
+React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: T.testo, marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, dati.nomeCucciolo || "—"),
+animale && React.createElement("img", { src: animale.img, alt: "", style: { width: "min(130px, 38vw)", height: "min(130px, 38vw)", objectFit: "contain", display: "block", margin: "0 auto 10px" } }),
+React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 6 } }, stageFor(dati.points || 0).label + " · ⭐ " + (dati.points || 0)),
+React.createElement("div", { style: { background: T.scuro ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.06)", borderRadius: 10, height: 16, overflow: "hidden", marginBottom: 6 } },
+React.createElement("div", { style: { background: vitaPerc > 40 ? T.accento : T.tenue, height: "100%", width: vitaPerc + "%" } })
+),
+React.createElement("div", { style: { fontSize: 10, color: T.tenue } }, "Vita max: " + formatDays(dati.vitaDays || 0)),
+dati.viziConteggi && React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginTop: 8, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "6px 12px" } },
+Object.keys(VIZI_TIPI).filter(tipo => (dati.viziConteggi[tipo] || 0) > 0)
+.map(tipo => React.createElement("span", { key: tipo }, VIZI_TIPI[tipo].emoji + " " + dati.viziConteggi[tipo]))
+),
+React.createElement("div", { style: { marginTop: 10, paddingTop: 10, borderTop: "1px solid " + T.bordo } },
+React.createElement("div", { style: { fontSize: 10, color: T.tenue, marginBottom: 8 } },
+"Tu: " + formatDays(profile.vitaDays || 0) + (mieVitaPerc >= vitaPerc ? " 🔼  " : " 🔽  ") + (dati.mioNome || "amico") + ": " + formatDays(dati.vitaDays || 0)
+),
+React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 6 } }, "👫 Fai qualcosa insieme"),
+React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginBottom: 4 } },
+Object.keys(VIZI_TIPI).map(tipo => React.createElement("button", {
+key: tipo,
+title: VIZI_TIPI[tipo].label,
+onClick: () => faiInsieme(codice, tipo),
+style: { background: T.card, border: "1px solid " + T.bordo, borderRadius: 8, padding: "6px 8px", fontSize: 15, cursor: "pointer" }
+}, VIZI_TIPI[tipo].emoji))
+),
+React.createElement("div", { style: { fontSize: 9, color: T.tenue } }, "Tocca per registrarlo per entrambi"),
+fattoTipo && React.createElement("div", { style: { fontSize: 11, color: T.accento, fontWeight: 700, marginTop: 8 } },
+"Fatto insieme! Vita aggiornata anche per " + (dati.mioNome || "lui/lei") + " 🎉"
+)
+)
+)
+);
+};
 
-        React.createElement("div", { style: { background: T.card, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
-          React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginBottom: 6 } }, "Il tuo codice — dallo ai tuoi amici"),
-          React.createElement("div", { style: { fontSize: 24, fontWeight: 700, color: T.testo, letterSpacing: 1, marginBottom: 10, fontFamily: "'Fredoka', sans-serif" } }, profile.codice || "—"),
-          React.createElement("button", { onClick: copia, style: { background: T.accento, color: T.suAccento, border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, copiato ? "Copiato ✓" : "Copia codice")
-        ),
+return React.createElement("div", { style: { padding: "4px 4px" } },
+React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "I tuoi amici 👥"),
 
-        // Campo aggiungi amico
-        React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
-          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Aggiungi un amico (" + codici.length + "/10)"),
-          React.createElement("div", { style: { display: "flex", gap: 8 } },
-            React.createElement("input", { value: nuovoCodice, onChange: e => { setNuovoCodice(e.target.value.toUpperCase()); setAvviso(""); }, placeholder: "Es. MILO-4K7Q", style: { flex: 1, padding: "9px 10px", borderRadius: 8, border: "1px solid " + T.bordo, background: T.scuro ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.7)", fontSize: 12, color: T.testo, minWidth: 0 } }),
-            React.createElement("button", { onClick: aggiungiAmico, style: { background: T.accento, color: T.suAccento, border: "none", borderRadius: 8, padding: "9px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" } }, "Collega")
-          ),
-          avviso && React.createElement("div", { style: { fontSize: 11, color: T.accento, fontWeight: 700, marginTop: 8 } }, avviso)
-        ),
+React.createElement("div", { style: { background: T.card, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
+React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginBottom: 6 } }, "Il tuo codice — dallo ai tuoi amici"),
+React.createElement("div", { style: { fontSize: 24, fontWeight: 700, color: T.testo, letterSpacing: 1, marginBottom: 10, fontFamily: "'Fredoka', sans-serif" } }, profile.codice || "—"),
+React.createElement("button", { onClick: copia, style: { background: T.accento, color: T.suAccento, border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, copiato ? "Copiato ✓" : "Copia codice")
+),
 
-        codici.length === 0
-          ? React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 16, textAlign: "center", border: "1px solid " + T.bordo } },
-              React.createElement("div", { style: { fontSize: 34, marginBottom: 8 } }, "🔗"),
-              React.createElement("div", { style: { fontSize: 12, color: T.tenue, lineHeight: 1.6 } }, "Non sei ancora collegata a nessuno. Fatti dare il codice di un amico e aggiungilo qui sopra.")
-            )
-          : codici.map(c => cardAmico(c)),
+// Campo aggiungi amico
+React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
+React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Aggiungi un amico (" + codici.length + "/10)"),
+React.createElement("div", { style: { display: "flex", gap: 8 } },
+React.createElement("input", { value: nuovoCodice, onChange: e => { setNuovoCodice(e.target.value.toUpperCase()); setAvviso(""); }, placeholder: "Es. MILO-4K7Q", style: { flex: 1, padding: "9px 10px", borderRadius: 8, border: "1px solid " + T.bordo, background: T.scuro ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.7)", fontSize: 12, color: T.testo, minWidth: 0 } }),
+React.createElement("button", { onClick: aggiungiAmico, style: { background: T.accento, color: T.suAccento, border: "none", borderRadius: 8, padding: "9px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" } }, "Collega")
+),
+avviso && React.createElement("div", { style: { fontSize: 11, color: T.accento, fontWeight: 700, marginTop: 8 } }, avviso)
+),
 
-        React.createElement("div", { style: { fontSize: 10, color: T.tenue, textAlign: "center", marginTop: 14, lineHeight: 1.5 } },
-          statoCloud === "ok" ? "Collegato al server ✓" : statoCloud === "offline" ? "Non collegato — i dati restano sul telefono" : "Collegamento in corso…")
-      );
-    }
+codici.length === 0
+? React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 16, textAlign: "center", border: "1px solid " + T.bordo } },
+React.createElement("div", { style: { fontSize: 34, marginBottom: 8 } }, "🔗"),
+React.createElement("div", { style: { fontSize: 12, color: T.tenue, lineHeight: 1.6 } }, "Non sei ancora collegata a nessuno. Fatti dare il codice di un amico e aggiungilo qui sopra.")
+)
+: codici.map(c => cardAmico(c)),
 
-    function Statistiche({ profile, T }) {
+React.createElement("div", { style: { fontSize: 10, color: T.tenue, textAlign: "center", marginTop: 14, lineHeight: 1.5 } },
+statoCloud === "ok" ? "Collegato al server ✓" : statoCloud === "offline" ? "Non collegato — i dati restano sul telefono" : "Collegamento in corso…")
+);
+}
+
+function Statistiche({ profile, T }) {
       const cleanSmokeDays = profile.lastSmoke ? Math.floor((new Date() - new Date(profile.lastSmoke)) / (1000 * 60 * 60 * 24)) : -1;
       const cleanDrinkDays = profile.lastDrink ? Math.floor((new Date() - new Date(profile.lastDrink)) / (1000 * 60 * 60 * 24)) : -1;
 
@@ -1391,7 +1457,7 @@ const completaLogin = (dati) => {
             React.createElement("div", { style: { fontSize: 64, marginBottom: 12 } }, "😔"),
             React.createElement("h2", { style: { fontSize: 20, fontWeight: 700, color: T.testo, marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, animal.name + " se ne è andato..."),
             React.createElement("button", { style: { marginTop: 24, background: T.accento, color: T.suAccento, border: "none", borderRadius: 18, padding: "11px 28px", fontWeight: 700, cursor: "pointer", fontFamily: "'Quicksand', sans-serif" }, onClick: () => { setAnimal(null); saveProfile(null); } }, "Ricominciare")
-          ) : tab === "home" ? React.createElement(Home, { profile, stage, animal, T }) : tab === "traguardi" ? React.createElement(Traguardi, { profile, setProfile: saveProfile, T }) : tab === "vizi" ? React.createElement(ViziSfizi, { profile, setProfile: saveProfile, T, codiciAmici: (profile.codiciAmici || (profile.codiceAmico ? [profile.codiceAmico] : [])), mioNome: profile.mioNome, onCondividi: condividiEventoAmico }) : tab === "amico" ? React.createElement(Amico, { profile, amiciDati, statoCloud, setProfile: saveProfile, T }) : tab === "impostazioni" ? React.createElement(Impostazioni, { profile, animal, cambiaTema, resetCucciolo, T, setProfile: saveProfile, cloudUser, onGoogleLogin: accediConGoogle, onSignOut: disconnettiGoogle, accessoInCorso }) : React.createElement(Statistiche, { profile, T })
+          ) : tab === "home" ? React.createElement(Home, { profile, stage, animal, T }) : tab === "traguardi" ? React.createElement(Traguardi, { profile, setProfile: saveProfile, T }) : tab === "vizi" ? React.createElement(ViziSfizi, { profile, setProfile: saveProfile, T, codiciAmici: (profile.codiciAmici || (profile.codiceAmico ? [profile.codiceAmico] : [])), mioNome: profile.mioNome, onCondividi: condividiEventoAmico }) : tab === "amico" ? React.createElement(Amico, { profile, amiciDati, statoCloud, setProfile: saveProfile, T, onCondividi: condividiEventoAmico }) : tab === "impostazioni" ? React.createElement(Impostazioni, { profile, animal, cambiaTema, resetCucciolo, T, setProfile: saveProfile, cloudUser, onGoogleLogin: accediConGoogle, onSignOut: disconnettiGoogle, accessoInCorso }) : React.createElement(Statistiche, { profile, T })
         ),
         !isDead && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(5, 1fr)", background: T.tinta, borderTop: "1px solid " + T.bordo, padding: "10px 8px 16px", gap: 5, flexShrink: 0 } },
           ["home","traguardi","vizi","amico","stats"].map((id, i) => React.createElement("button", { key: id, onClick: () => setTab(id), style: { background: tab === id ? T.accento : T.cardSoft, color: tab === id ? T.suAccento : T.tenue, border: "1px solid " + (tab === id ? T.accento : T.bordo), borderRadius: 12, padding: "12px 0", cursor: "pointer", fontWeight: tab === id ? 700 : 600, fontFamily: "'Quicksand', sans-serif", fontSize: i >= 3 ? 10 : 11 } }, ["Casa","Traguardi","Vizi","Amico","Stats"][i]))
