@@ -257,7 +257,9 @@ leggiAccount: async (uid) => { try { const s = await getDoc(doc(db, "utenti", ui
         React.createElement("div", { style: { fontSize: 52, marginBottom: 10 } }, "🐾"),
         React.createElement("h1", { style: { fontSize: 26, marginBottom: 6, color: "#4A3A6B", fontWeight: 700, fontFamily: "'Fredoka', sans-serif" } }, "Benvenuta in Cucciolo"),
         React.createElement("p", { style: { fontSize: 12, color: "#8F84B0", marginBottom: 24, lineHeight: 1.5 } }, "Un compagno che vive 20 anni insieme a te."),
-React.createElement("button", { onClick: onGoogleLogin, disabled: accessoInCorso, style: { width: "100%", maxWidth: 340, background: "#ffffff", color: "#4A3A6B", border: "1px solid rgba(74,58,107,0.25)", borderRadius: 14, padding: "13px", fontWeight: 700, fontSize: 14, cursor: accessoInCorso ? "default" : "pointer", marginBottom: 14 } }, accessoInCorso ? "Accesso in corso…" : "🔵 Accedi con Google"),
+nomeGoogle
+? React.createElement("div", { style: { width: "100%", maxWidth: 340, background: "rgba(255,255,255,0.55)", color: "#4A3A6B", border: "1px solid rgba(74,58,107,0.25)", borderRadius: 14, padding: "13px", fontWeight: 700, fontSize: 13, marginBottom: 14 } }, "🐶 Connessa con Google come " + nomeGoogle)
+: React.createElement("button", { onClick: onGoogleLogin, disabled: accessoInCorso, style: { width: "100%", maxWidth: 340, background: "#ffffff", color: "#4A3A6B", border: "1px solid rgba(74,58,107,0.25)", borderRadius: 14, padding: "13px", fontWeight: 700, fontSize: 14, cursor: accessoInCorso ? "default" : "pointer", marginBottom: 14 } }, accessoInCorso ? "Accesso in corso…" : "🐶 Accedi con Google"),
 React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBottom: 18 } }, "— oppure crea il profilo manualmente —"),
 
         React.createElement("div", { style: { width: "100%", maxWidth: 340 } },
@@ -1066,12 +1068,12 @@ const viziNascosti_S = profile.viziNascosti || [];
 React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo, textAlign: "center" } },
 cloudUser
 ? React.createElement("div", null,
-React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 8 } }, "Collegata come " + (cloudUser.displayName || cloudUser.email || "account Google")),
+React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 8 } }, "🐶 Collegata come " + (cloudUser.displayName || cloudUser.email || "account Google")),
 React.createElement("button", { onClick: onSignOut, style: { background: "transparent", color: T.accento, border: "1px solid " + T.bordo, borderRadius: 10, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "Esci dall'account")
 )
 : React.createElement("div", null,
 React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 8 } }, "Collega un account Google per non perdere mai il tuo cucciolo"),
-React.createElement("button", { onClick: onGoogleLogin, disabled: accessoInCorso, style: { background: "#ffffff", color: T.testo, border: "1px solid " + T.bordo, borderRadius: 10, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: accessoInCorso ? "default" : "pointer" } }, accessoInCorso ? "Accesso in corso…" : "🔵 Accedi con Google")
+React.createElement("button", { onClick: onGoogleLogin, disabled: accessoInCorso, style: { background: "#ffffff", color: T.testo, border: "1px solid " + T.bordo, borderRadius: 10, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: accessoInCorso ? "default" : "pointer" } }, accessoInCorso ? "Accesso in corso…" : "🐶 Accedi con Google")
 )
 ),
 
