@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-title" content="Cucciolo">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="ragdoll.PNG">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><text x='50%' y='50%' font-size='120' text-anchor='middle' dominant-baseline='middle'>ð±</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><text x='50%' y='50%' font-size='120' text-anchor='middle' dominant-baseline='middle'>🐱</text></svg>">
   <title>Cucciolo - Il tuo animale</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
@@ -49,7 +49,7 @@
 
   <script>
     // Applica SUBITO il colore del tema salvato (prima che l'app parta),
-    // cosÃ¬ la barra dell'iPhone non resta rosa.
+    // così la barra dell'iPhone non resta rosa.
     (function () {
       var TINTE = { rosa:"#FFE3F1", azzurro:"#DCEEFF", verde:"#DCF5EA", rosso:"#FCE0E0", viola:"#EFE1FB", giallo:"#FFF4CC", bianco:"#F7F8FC", notte:"#0B0B10" };
       try {
@@ -131,16 +131,16 @@ leggiAccount: async (uid) => { try { const s = await getDoc(doc(db, "utenti", ui
     ];
 
     const MILESTONE_TYPES = {
-      studio: { label: "Studio", unit: "ore", perUnit: 1.5, emoji: "ð", min: 1, max: 12, maxGiorno: 12 },
-      dormi: { label: "Sonno", unit: "ore", perUnit: 0.8, emoji: "ð´", min: 1, max: 12, maxGiorno: 12 },
-      esame: { label: "Esame", unit: "voto", isExam: true, emoji: "ð" },
-      denti: { label: "Lavato i denti", unit: "volte", perUnit: 2, emoji: "ðª¥", min: 1, max: 4, maxGiorno: 4, aVolte: true },
-      allenamento: { label: "Allenamento", unit: "ore", perUnit: 3, emoji: "ðª", min: 0.5, max: 5, maxGiorno: 5 },
-      doccia: { label: "Doccia", unit: "volte", perUnit: 2, emoji: "ð¿", min: 1, max: 4, maxGiorno: 4, aVolte: true },
-      lenzuola: { label: "Cambio lenzuola", unit: "volte", perUnit: 4, emoji: "ðï¸", min: 1, max: 1, maxGiorno: 1, aVolte: true },
+      studio: { label: "Studio", unit: "ore", perUnit: 1.5, emoji: "📚", min: 1, max: 12, maxGiorno: 12 },
+      dormi: { label: "Sonno", unit: "ore", perUnit: 0.8, emoji: "😴", min: 1, max: 12, maxGiorno: 12 },
+      esame: { label: "Esame", unit: "voto", isExam: true, emoji: "🎓" },
+      denti: { label: "Lavato i denti", unit: "volte", perUnit: 2, emoji: "🪥", min: 1, max: 4, maxGiorno: 4, aVolte: true },
+      allenamento: { label: "Allenamento", unit: "ore", perUnit: 3, emoji: "💪", min: 0.5, max: 5, maxGiorno: 5 },
+      doccia: { label: "Doccia", unit: "volte", perUnit: 2, emoji: "🚿", min: 1, max: 4, maxGiorno: 4, aVolte: true },
+      lenzuola: { label: "Cambio lenzuola", unit: "volte", perUnit: 4, emoji: "🛏️", min: 1, max: 1, maxGiorno: 1, aVolte: true },
     };
 
-    // Somma di quanto giÃ  fatto OGGI per un certo tipo di traguardo
+    // Somma di quanto già fatto OGGI per un certo tipo di traguardo
     function fattoOggi(milestones, tipo) {
       const oggi = new Date();
       const stessoGiorno = (iso) => {
@@ -151,40 +151,40 @@ leggiAccount: async (uid) => { try { const s = await getDoc(doc(db, "utenti", ui
     }
 
     const RECIPES = [
-      { id: "cap", name: "Caprese", emoji: "ð¥", vita: 30 },
-      { id: "pesto", name: "Pasta al pesto", emoji: "ð", vita: 50 },
-      { id: "tira", name: "TiramisÃ¹", emoji: "ð°", vita: 60 },
-      { id: "carb", name: "Carbonara", emoji: "ð", vita: 55 },
-      { id: "gnocchi", name: "Gnocchi", emoji: "ð²", vita: 48 },
-      { id: "brusc", name: "Bruschetta", emoji: "ð¥", vita: 35 },
-      { id: "risotto", name: "Risotto funghi", emoji: "ð", vita: 52 },
-      { id: "pizza", name: "Pizza", emoji: "ð", vita: 58 },
-      { id: "amatri", name: "Amatriciana", emoji: "ð", vita: 53 },
-      { id: "osso", name: "Osso buco", emoji: "ð", vita: 65 },
+      { id: "cap", name: "Caprese", emoji: "🥗", vita: 30 },
+      { id: "pesto", name: "Pasta al pesto", emoji: "🍝", vita: 50 },
+      { id: "tira", name: "Tiramisù", emoji: "🍰", vita: 60 },
+      { id: "carb", name: "Carbonara", emoji: "🍝", vita: 55 },
+      { id: "gnocchi", name: "Gnocchi", emoji: "🍲", vita: 48 },
+      { id: "brusc", name: "Bruschetta", emoji: "🥖", vita: 35 },
+      { id: "risotto", name: "Risotto funghi", emoji: "🍚", vita: 52 },
+      { id: "pizza", name: "Pizza", emoji: "🍕", vita: 58 },
+      { id: "amatri", name: "Amatriciana", emoji: "🍝", vita: 53 },
+      { id: "osso", name: "Osso buco", emoji: "🍖", vita: 65 },
     ];
 
     const MOTIVATIONAL_QUOTES = [
-      "Oggi Ã¨ un giorno perfetto per non fumare! ðª",
-      "L'acqua Ã¨ la miglior medicina. Bevi! ð§",
-      "Mangia bene, il tuo animale ti ringrazierÃ  ð¥",
-      "Ogni traguardo Ã¨ un passo verso la felicitÃ  â­",
-      "Prendersi cura di te = prendersi cura di lui ð",
-      "Non fumare oggi = +2 anni per il tuo animale ð",
-      "Un drink in meno = salute in piÃ¹ ð",
-      "Il tuo animale crede in te! ð¾",
-      "Riposa bene, recupera le forze ð´",
-      "Muoviti un po'! Il tuo corpo e il tuo animale ringraziano ð",
+      "Oggi è un giorno perfetto per non fumare! 💪",
+      "L'acqua è la miglior medicina. Bevi! 💧",
+      "Mangia bene, il tuo animale ti ringrazierà 🥗",
+      "Ogni traguardo è un passo verso la felicità ⭐",
+      "Prendersi cura di te = prendersi cura di lui 💚",
+      "Non fumare oggi = +2 anni per il tuo animale 🎉",
+      "Un drink in meno = salute in più 🌟",
+      "Il tuo animale crede in te! 🐾",
+      "Riposa bene, recupera le forze 😴",
+      "Muoviti un po'! Il tuo corpo e il tuo animale ringraziano 🏃",
     ];
 
     const MAX_VITA_DAYS = 7300; // 20 anni = tetto massimo raggiungibile
     const GIORNI_SETTIMANA = 7;
 
     function stageFor(points) {
-      if (points < 100) return { key: "cucciolo", label: "Cucciolotto", icon: "ð¼" };
-      if (points < 250) return { key: "adolescente", label: "Adolescente", icon: "ð" };
-      if (points < 450) return { key: "piccolo_adulto", label: "Piccolo Adulto", icon: "ð" };
-      if (points < 700) return { key: "adulto", label: "Adulto", icon: "ð¼" };
-      return { key: "anziano", label: "Anziano", icon: "ð§" };
+      if (points < 100) return { key: "cucciolo", label: "Cucciolotto", icon: "🍼" };
+      if (points < 250) return { key: "adolescente", label: "Adolescente", icon: "🎒" };
+      if (points < 450) return { key: "piccolo_adulto", label: "Piccolo Adulto", icon: "📚" };
+      if (points < 700) return { key: "adulto", label: "Adulto", icon: "💼" };
+      return { key: "anziano", label: "Anziano", icon: "🧓" };
     }
 
     function uid() {
@@ -198,7 +198,7 @@ leggiAccount: async (uid) => { try { const s = await getDoc(doc(db, "utenti", ui
       return `${Math.floor(days)}g`;
     }
 
-    // EtÃ  vera dell'animale in giorni: quanti giorni reali dal login
+    // Età vera dell'animale in giorni: quanti giorni reali dal login
     function etaGiorni(profile) {
       if (!profile || !profile.dataInizio) return 0;
       const ms = Date.now() - new Date(profile.dataInizio).getTime();
@@ -225,11 +225,11 @@ leggiAccount: async (uid) => { try { const s = await getDoc(doc(db, "utenti", ui
       const stileLabel = { fontSize: 11, color: "#FF6FB0", marginBottom: 5, display: "block", fontWeight: 700, textAlign: "left" };
 
       return React.createElement("div", { style: { padding: "40px 22px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", overflowY: "auto", WebkitOverflowScrolling: "touch", textAlign: "center", background: "linear-gradient(135deg, #FFE8F5, #E8F5FF)", paddingTop: "calc(40px + env(safe-area-inset-top))", paddingBottom: "calc(40px + env(safe-area-inset-bottom))" } },
-        React.createElement("div", { style: { fontSize: 52, marginBottom: 10 } }, "ð¾"),
+        React.createElement("div", { style: { fontSize: 52, marginBottom: 10 } }, "🐾"),
         React.createElement("h1", { style: { fontSize: 26, marginBottom: 6, color: "#4A3A6B", fontWeight: 700, fontFamily: "'Fredoka', sans-serif" } }, "Benvenuta in Cucciolo"),
         React.createElement("p", { style: { fontSize: 12, color: "#8F84B0", marginBottom: 24, lineHeight: 1.5 } }, "Un compagno che vive 20 anni insieme a te."),
-React.createElement("button", { onClick: onGoogleLogin, disabled: accessoInCorso, style: { width: "100%", maxWidth: 340, background: "#ffffff", color: "#4A3A6B", border: "1px solid rgba(74,58,107,0.25)", borderRadius: 14, padding: "13px", fontWeight: 700, fontSize: 14, cursor: accessoInCorso ? "default" : "pointer", marginBottom: 14 } }, accessoInCorso ? "Accesso in corsoâ¦" : "ðµ Accedi con Google"),
-React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBottom: 18 } }, "â oppure crea il profilo manualmente â"),
+React.createElement("button", { onClick: onGoogleLogin, disabled: accessoInCorso, style: { width: "100%", maxWidth: 340, background: "#ffffff", color: "#4A3A6B", border: "1px solid rgba(74,58,107,0.25)", borderRadius: 14, padding: "13px", fontWeight: 700, fontSize: 14, cursor: accessoInCorso ? "default" : "pointer", marginBottom: 14 } }, accessoInCorso ? "Accesso in corso…" : "🔵 Accedi con Google"),
+React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBottom: 18 } }, "— oppure crea il profilo manualmente —"),
 
         React.createElement("div", { style: { width: "100%", maxWidth: 340 } },
           React.createElement("label", { style: stileLabel }, "Il tuo nome"),
@@ -240,7 +240,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
 
           React.createElement("label", { style: stileLabel }, "Codice amico (se ne hai uno)"),
           React.createElement("input", { style: stileInput, value: codiceAmico, onChange: e => setCodiceAmico(e.target.value.toUpperCase()), placeholder: "Lascia vuoto se non ce l'hai" }),
-          React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBottom: 20, textAlign: "left", lineHeight: 1.5 } }, "Se il tuo compagno ha giÃ  l'app, chiedigli il suo codice e scrivilo qui. Altrimenti lascia vuoto: il tuo codice te lo daremo noi."),
+          React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBottom: 20, textAlign: "left", lineHeight: 1.5 } }, "Se il tuo compagno ha già l'app, chiedigli il suo codice e scrivilo qui. Altrimenti lascia vuoto: il tuo codice te lo daremo noi."),
 
           React.createElement("button", {
             style: { width: "100%", background: pronto ? "linear-gradient(135deg, #FFC53D, #FFD966)" : "rgba(200,190,220,0.5)", color: "#4A3A6B", border: "none", borderRadius: 16, padding: "13px", fontWeight: 700, fontSize: 15, cursor: pronto ? "pointer" : "default", boxShadow: pronto ? "0 8px 24px rgba(255,197,61,0.3)" : "none" },
@@ -253,7 +253,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
 
     function AnimalSelector({ onSelect }) {
       return React.createElement("div", { style: { padding: "40px 22px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", overflowY: "auto", WebkitOverflowScrolling: "touch", textAlign: "center", background: "linear-gradient(135deg, #FFE8F5, #E8F5FF)", paddingTop: "calc(40px + env(safe-area-inset-top))", paddingBottom: "calc(40px + env(safe-area-inset-bottom))" } },
-        React.createElement("div", { style: { fontSize: 52, marginBottom: 12 } }, "ð¾"),
+        React.createElement("div", { style: { fontSize: 52, marginBottom: 12 } }, "🐾"),
         React.createElement("h1", { style: { fontSize: 28, marginBottom: 8, color: "#4A3A6B", fontWeight: 700, fontFamily: "'Fredoka', sans-serif" } }, "Scegli il tuo animale!"),
         React.createElement("p", { style: { fontSize: 12, color: "#8F84B0", marginBottom: 24 } }, "Quale animale vuoi che cresca con te?"),
         React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12, marginBottom: 24, width: "100%" } },
@@ -266,7 +266,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
     }
 
     function Home({ profile, stage, animal, T }) {
-      const eta = etaGiorni(profile);              // etÃ  vera in giorni
+      const eta = etaGiorni(profile);              // età vera in giorni
       const tetto = profile.vitaDays;              // tetto massimo in giorni
       const restano = Math.max(0, tetto - eta);
       const etaPerc = Math.max(0, Math.min(100, (eta / MAX_VITA_DAYS) * 100));
@@ -288,12 +288,12 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         React.createElement("div", { style: { textAlign: "center", marginBottom: 16 } },
           React.createElement("img", { src: animal.img, alt: animal.name, style: { width: "min(240px, 60vw)", height: "min(240px, 60vw)", objectFit: "contain", display: "block", margin: "0 auto 12px", filter: "drop-shadow(0 10px 20px rgba(0,0,0,.18))" } }),
           React.createElement("div", { style: { fontWeight: 700, fontSize: 14, color: T.testo } }, stage.label),
-          React.createElement("div", { style: { fontSize: 11, color: T.tenue } }, "â­ " + profile.points + " pt")
+          React.createElement("div", { style: { fontSize: 11, color: T.tenue } }, "⭐ " + profile.points + " pt")
         ),
         React.createElement("div", { style: { background: T.card, backdropFilter: "blur(10px)", borderRadius: 14, padding: 14, marginBottom: 12, border: "1px solid " + T.bordo } },
-          barra("EtÃ ", formatDays(eta), etaPerc, T.accento),
+          barra("Età", formatDays(eta), etaPerc, T.accento),
           barra("Vita massima", formatDays(tetto), tettoPerc, T.tenue),
-          React.createElement("div", { style: { fontSize: 10, color: T.tenue, marginTop: 2, textAlign: "center" } }, "Gli restano " + formatDays(restano) + " Â· cresce ogni giorno")
+          React.createElement("div", { style: { fontSize: 10, color: T.tenue, marginTop: 2, textAlign: "center" } }, "Gli restano " + formatDays(restano) + " · cresce ogni giorno")
         ),
         React.createElement("div", { style: { background: T.cardSoft, backdropFilter: "blur(10px)", borderRadius: 12, padding: 12, border: "1px solid " + T.bordo } },
           React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginBottom: 4 } }, "Motto del giorno"),
@@ -302,7 +302,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
       );
     }
 
-    // Voti esame: valore mostrato + giorni di vita (piÃ¹ alto il voto, piÃ¹ vita; bocciato toglie)
+    // Voti esame: valore mostrato + giorni di vita (più alto il voto, più vita; bocciato toglie)
     const EXAM_GRADES = [
       { label: "Bocciato", vita: -182, points: 0 },
       { label: "18", vita: 30, points: 20 },
@@ -341,7 +341,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         setNome(""); setEmoji(""); setQuanti(""); setUnita("settimane"); setApri(false);
       };
 
-      if (!apri) return React.createElement("button", { onClick: () => setApri(true), style: { width: "100%", background: T.cardSoft, color: T.accento, border: "1px dashed " + T.accento, borderRadius: 12, padding: "12px", fontWeight: 700, fontSize: 13, cursor: "pointer", marginBottom: 16 } }, "ï¼ Aggiungi un traguardo");
+      if (!apri) return React.createElement("button", { onClick: () => setApri(true), style: { width: "100%", background: T.cardSoft, color: T.accento, border: "1px dashed " + T.accento, borderRadius: 12, padding: "12px", fontWeight: 700, fontSize: 13, cursor: "pointer", marginBottom: 16 } }, "＋ Aggiungi un traguardo");
 
       return React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
         React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "Nuovo traguardo"),
@@ -384,7 +384,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
           const giaOggi = fattoOggi(profile.milestones, typeKey);
           if (giaOggi + val > type.maxGiorno) {
             const resto = Math.max(0, type.maxGiorno - giaOggi);
-            setAvviso(resto === 0 ? "Hai giÃ  raggiunto il massimo di oggi" : "Oggi puoi aggiungere ancora " + resto + " " + type.unit);
+            setAvviso(resto === 0 ? "Hai già raggiunto il massimo di oggi" : "Oggi puoi aggiungere ancora " + resto + " " + type.unit);
             return;
           }
         }
@@ -444,7 +444,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         React.createElement("p", { style: { fontSize: 12, color: T.tenue, marginBottom: 12 } }, "Studio, sonno, esami, igiene, allenamento."),
         React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginBottom: 12 } },
           Object.entries(MILESTONE_TUTTI).filter(([key]) => !tragNascosti.includes(key)).map(([key, type]) => React.createElement("button", { key, onClick: () => { setActiveType(activeType === key ? null : key); setInputValue(""); setExamGrade(""); setAvviso(""); }, style: { position: "relative", background: activeType === key ? T.accento : T.cardSoft, border: "1px solid " + (activeType === key ? T.accento : T.bordo), borderRadius: 10, padding: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, cursor: "pointer", fontSize: 10, color: activeType === key ? T.suAccento : T.testo, fontWeight: activeType === key ? 700 : 500, fontFamily: "'Quicksand', sans-serif" } },
-            React.createElement("span", { onClick: (e) => { e.stopPropagation(); type.personale ? cancellaTraguardo(key) : nascondiTraguardo(key); }, style: { position: "absolute", top: 2, right: 5, color: T.tenue, fontSize: 13 } }, "Ã"),
+            React.createElement("span", { onClick: (e) => { e.stopPropagation(); type.personale ? cancellaTraguardo(key) : nascondiTraguardo(key); }, style: { position: "absolute", top: 2, right: 5, color: T.tenue, fontSize: 13 } }, "×"),
             React.createElement("div", { style: { fontSize: 18 } }, type.emoji),
             React.createElement("div", null, type.label)
           ))
@@ -452,7 +452,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         // Form aggiungi traguardo personalizzato
         React.createElement(FormTraguardo, { profile, setProfile, T }),
         (activeType && MILESTONE_TUTTI[activeType] && MILESTONE_TUTTI[activeType].personale) && React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 12, marginBottom: 16, border: "1px solid rgba(69, 214, 181, 0.3)" } },
-          React.createElement("button", { style: { width: "100%", background: T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "10px", fontWeight: 700, cursor: "pointer", fontSize: 13 }, onClick: () => handleAddPersonale(activeType) }, "ï¼ Registra " + MILESTONE_TUTTI[activeType].label)
+          React.createElement("button", { style: { width: "100%", background: T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "10px", fontWeight: 700, cursor: "pointer", fontSize: 13 }, onClick: () => handleAddPersonale(activeType) }, "＋ Registra " + MILESTONE_TUTTI[activeType].label)
         ),
         (activeType && !isExam && MILESTONE_TYPES[activeType]) && (function () {
           const type = MILESTONE_TYPES[activeType];
@@ -462,11 +462,11 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
           return React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 12, marginBottom: 16, border: "1px solid rgba(69, 214, 181, 0.3)" } },
             React.createElement("label", { style: { fontSize: 11, color: T.accento, marginBottom: 8, display: "block", fontWeight: 700 } },
               type.aVolte
-                ? (pieno ? "Oggi hai giÃ  raggiunto il massimo (" + type.maxGiorno + ")" : "Aggiungi una volta â oggi: " + giaOggi + "/" + type.maxGiorno)
+                ? (pieno ? "Oggi hai già raggiunto il massimo (" + type.maxGiorno + ")" : "Aggiungi una volta — oggi: " + giaOggi + "/" + type.maxGiorno)
                 : ("Quante " + type.unit + "? (da " + type.min + " a " + type.max + (resto != null ? ", oggi restano " + resto : "") + ")")
             ),
             type.aVolte
-              ? React.createElement("button", { disabled: pieno, style: { width: "100%", background: pieno ? "rgba(150,150,170,0.3)" : T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "10px", fontWeight: 700, cursor: pieno ? "default" : "pointer", fontSize: 13 }, onClick: () => { if (!pieno) { setInputValue("1"); setTimeout(() => handleAdd(activeType), 0); } } }, pieno ? "Bloccato per oggi" : "ï¼ Registra una volta")
+              ? React.createElement("button", { disabled: pieno, style: { width: "100%", background: pieno ? "rgba(150,150,170,0.3)" : T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "10px", fontWeight: 700, cursor: pieno ? "default" : "pointer", fontSize: 13 }, onClick: () => { if (!pieno) { setInputValue("1"); setTimeout(() => handleAdd(activeType), 0); } } }, pieno ? "Bloccato per oggi" : "＋ Registra una volta")
               : React.createElement("div", { style: { display: "flex", gap: 8 } },
                   React.createElement("input", { style: { flex: 1, padding: "8px 10px", borderRadius: 8, border: "1px solid rgba(255, 255, 255, 0.4)", background: "rgba(255, 255, 255, 0.5)", fontSize: 12 }, type: "number", value: inputValue, onChange: (e) => { setInputValue(e.target.value); setAvviso(""); }, placeholder: "Es. " + type.min, min: String(type.min), max: String(type.max), step: type.min < 1 ? "0.5" : "1" }),
                   React.createElement("button", { disabled: pieno, style: { background: pieno ? "rgba(150,150,170,0.3)" : T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "8px 14px", fontWeight: 700, cursor: pieno ? "default" : "pointer", fontSize: 12 }, onClick: () => handleAdd(activeType) }, "Registra")
@@ -481,7 +481,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
             EXAM_GRADES.map(g => React.createElement("option", { key: g.label, value: g.label }, g.label))
           ),
           examGrade && React.createElement("div", { style: { fontSize: 11, fontWeight: 700, marginBottom: 10, color: (EXAM_GRADES.find(x=>x.label===examGrade).vita >= 0 ? T.accento : T.accento) } },
-            (EXAM_GRADES.find(x=>x.label===examGrade).vita >= 0 ? "Vita +" : "Vita â") + formatDays(Math.abs(EXAM_GRADES.find(x=>x.label===examGrade).vita))
+            (EXAM_GRADES.find(x=>x.label===examGrade).vita >= 0 ? "Vita +" : "Vita −") + formatDays(Math.abs(EXAM_GRADES.find(x=>x.label===examGrade).vita))
           ),
           React.createElement("button", { style: { width: "100%", background: T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "10px", fontWeight: 700, cursor: "pointer", fontSize: 13, fontFamily: "'Quicksand', sans-serif" }, onClick: handleAddExam }, "Registra esame")
         ),
@@ -490,7 +490,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
           ? React.createElement("p", { style: { fontSize: 12, color: T.tenue } }, "Nessun traguardo ancora.")
           : React.createElement(SettimanaCalendario, {
               voci: profile.milestones,
-              emojiDi: (m) => (MILESTONE_TYPES[m.type] || (profile.traguardiPersonali || {})[m.type] || { emoji: "â¢" }).emoji,
+              emojiDi: (m) => (MILESTONE_TYPES[m.type] || (profile.traguardiPersonali || {})[m.type] || { emoji: "•" }).emoji,
               etichettaDi: (m) => {
                 const info = MILESTONE_TYPES[m.type] || (profile.traguardiPersonali || {})[m.type] || { label: "Traguardo" };
                 const dett = m.type === "esame" ? ("voto " + m.gradeLabel) : (m.amount + " " + (m.unitLabel || ""));
@@ -510,21 +510,21 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
 
     // Etichette per lo storico dei vizi/sfizi
     const VIZI_TIPI = {
-      sigaretta: { label: "Sigaretta", emoji: "ð¬", vita: -90 },
-      iqos:      { label: "IQOS",      emoji: "ð¨", vita: -60 },
-      canna:     { label: "Canna",     emoji: "ð¿", vita: -150 },
-      droga:     { label: "Droga",     emoji: "ð", vita: -365 },
-      abbuffata: { label: "Abbuffata", emoji: "ð", vita: -90 },
-      sbronza:   { label: "Sbronza",   emoji: "ð¥´", vita: -180 },
-      drink:     { label: "Drink",     emoji: "ð·", vita: -30 },
-      sesso:     { label: "Sesso",     emoji: "â¤ï¸", vita: 7 },
+      sigaretta: { label: "Sigaretta", emoji: "🚬", vita: -90 },
+      iqos:      { label: "IQOS",      emoji: "💨", vita: -60 },
+      canna:     { label: "Canna",     emoji: "🌿", vita: -150 },
+      droga:     { label: "Droga",     emoji: "💊", vita: -365 },
+      abbuffata: { label: "Abbuffata", emoji: "🍔", vita: -90 },
+      sbronza:   { label: "Sbronza",   emoji: "🥴", vita: -180 },
+      drink:     { label: "Drink",     emoji: "🍷", vita: -30 },
+      sesso:     { label: "Sesso",     emoji: "❤️", vita: 7 },
     };
 
     // Testo breve dell'effetto, per il pulsante
     function effettoVita(giorni) {
       if (giorni === 7) return "+1 sett.";
       const mesi = Math.round(Math.abs(giorni) / 30);
-      const segno = giorni < 0 ? "â" : "+";
+      const segno = giorni < 0 ? "−" : "+";
       if (Math.abs(giorni) >= 365) return segno + "1 anno";
       return segno + mesi + (mesi === 1 ? " mese" : " mesi");
     }
@@ -558,7 +558,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
       if (chiaveGiorno(iso) === chiaveGiorno(ieri.toISOString())) return "Ieri";
       return d.getDate() + " " + MESI_IT[d.getMonth()];
     }
-    // Raggruppa lo storico per giornata, mantenendo l'ordine (dal piÃ¹ recente)
+    // Raggruppa lo storico per giornata, mantenendo l'ordine (dal più recente)
     function raggruppaPerGiorno(log) {
       const gruppi = [];
       const indice = {};
@@ -584,9 +584,9 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         return () => clearInterval(id);
       }, [onCancella]);
 
-      // Trovo il lunedÃ¬ della settimana corrente + offset
+      // Trovo il lunedì della settimana corrente + offset
       const oggi = new Date();
-      const giornoSett = (oggi.getDay() + 6) % 7;        // 0 = lunedÃ¬
+      const giornoSett = (oggi.getDay() + 6) % 7;        // 0 = lunedì
       const lunedi = new Date(oggi);
       lunedi.setDate(oggi.getDate() - giornoSett + offset * 7);
       lunedi.setHours(0, 0, 0, 0);
@@ -600,16 +600,16 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         giorni.push({ data: d, chiave: k, voci: vociGiorno });
       }
 
-      const etichettaSettimana = lunedi.getDate() + " " + MESI_IT[lunedi.getMonth()].slice(0, 3) + " â " + giorni[6].data.getDate() + " " + MESI_IT[giorni[6].data.getMonth()].slice(0, 3);
+      const etichettaSettimana = lunedi.getDate() + " " + MESI_IT[lunedi.getMonth()].slice(0, 3) + " – " + giorni[6].data.getDate() + " " + MESI_IT[giorni[6].data.getMonth()].slice(0, 3);
       const selezionato = giornoSel && giorni.find(g => g.chiave === giornoSel);
       const chiaveOggi = chiaveGiorno(oggi.toISOString());
 
       return React.createElement("div", null,
         // intestazione con frecce
         React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 } },
-          React.createElement("button", { onClick: () => { setOffset(offset - 1); setGiornoSel(null); }, style: { background: T.cardSoft, border: "1px solid " + T.bordo, borderRadius: 8, padding: "4px 12px", color: T.testo, cursor: "pointer", fontSize: 16 } }, "â¹"),
+          React.createElement("button", { onClick: () => { setOffset(offset - 1); setGiornoSel(null); }, style: { background: T.cardSoft, border: "1px solid " + T.bordo, borderRadius: 8, padding: "4px 12px", color: T.testo, cursor: "pointer", fontSize: 16 } }, "‹"),
           React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo } }, offset === 0 ? "Questa settimana" : etichettaSettimana),
-          React.createElement("button", { onClick: () => { if (offset < 0) { setOffset(offset + 1); setGiornoSel(null); } }, disabled: offset >= 0, style: { background: T.cardSoft, border: "1px solid " + T.bordo, borderRadius: 8, padding: "4px 12px", color: offset >= 0 ? T.tenue : T.testo, cursor: offset >= 0 ? "default" : "pointer", fontSize: 16 } }, "âº")
+          React.createElement("button", { onClick: () => { if (offset < 0) { setOffset(offset + 1); setGiornoSel(null); } }, disabled: offset >= 0, style: { background: T.cardSoft, border: "1px solid " + T.bordo, borderRadius: 8, padding: "4px 12px", color: offset >= 0 ? T.tenue : T.testo, cursor: offset >= 0 ? "default" : "pointer", fontSize: 16 } }, "›")
         ),
         // 7 colonne
         React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 3, marginBottom: 12 } },
@@ -641,7 +641,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
     }
 
     // Emoji tra cui scegliere per i vizi personalizzati
-    const EMOJI_VIZI = ["ð¬","ð¨","ð¿","ð","ð","ð¥´","ð·","ðº","ð","ð«","ð°","ð°","ð®","ð±","ð»","ðï¸","â","ð¥¤","ð","ð©","ð","ð¸","ð","ðº","ð¦","ð§","ð¬","ð¥","ð¸","ð²","ð","ð´"];
+    const EMOJI_VIZI = ["🚬","💨","🌿","💊","🍔","🥴","🍷","🍺","🍕","🍫","🍰","🎰","🎮","📱","💻","🛍️","☕","🥤","🍟","🍩","🚗","💸","🃏","📺","🍦","🧁","🍬","🥃","🍸","🎲","🛒","😴"];
 
     function ViziSfizi({ profile, setProfile, T }) {
       const [apriForm, setApriForm] = useState(false);
@@ -693,7 +693,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         const t = TUTTI[tipo];
         const positivo = t.vita > 0;
         return React.createElement("div", { style: { textAlign: "center", background: positivo ? T.cardSoft : (T.scuro ? "rgba(255,255,255,0.06)" : T.card), borderRadius: 12, padding: 12, border: "1px solid " + (positivo ? T.bordo : T.bordo), position: "relative" } },
-          React.createElement("button", { onClick: () => t.personale ? cancellaVizio(tipo) : nascondiVizio(tipo), title: t.personale ? "Elimina" : "Nascondi", style: { position: "absolute", top: 4, right: 6, background: "transparent", border: "none", color: T.tenue, fontSize: 14, cursor: "pointer", lineHeight: 1 } }, "Ã"),
+          React.createElement("button", { onClick: () => t.personale ? cancellaVizio(tipo) : nascondiVizio(tipo), title: t.personale ? "Elimina" : "Nascondi", style: { position: "absolute", top: 4, right: 6, background: "transparent", border: "none", color: T.tenue, fontSize: 14, cursor: "pointer", lineHeight: 1 } }, "×"),
           React.createElement("div", { style: { fontSize: 22, marginBottom: 2 } }, t.emoji),
           React.createElement("div", { style: { fontSize: 10, color: T.tenue, marginBottom: 2 } }, t.label),
           React.createElement("div", { style: { fontSize: 22, fontWeight: 700, color: positivo ? T.accento : T.accento } }, conteggio || 0),
@@ -720,7 +720,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
 
         // Pulsante aggiungi / form
         !apriForm
-          ? React.createElement("button", { onClick: () => setApriForm(true), style: { width: "100%", background: T.cardSoft, color: T.accento, border: "1px dashed " + T.accento, borderRadius: 12, padding: "12px", fontWeight: 700, fontSize: 13, cursor: "pointer", marginBottom: 16 } }, "ï¼ Aggiungi un tuo vizio")
+          ? React.createElement("button", { onClick: () => setApriForm(true), style: { width: "100%", background: T.cardSoft, color: T.accento, border: "1px dashed " + T.accento, borderRadius: 12, padding: "12px", fontWeight: 700, fontSize: 13, cursor: "pointer", marginBottom: 16 } }, "＋ Aggiungi un tuo vizio")
           : React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
               React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "Nuovo vizio"),
               React.createElement("input", { value: nuovoNome, onChange: e => setNuovoNome(e.target.value), placeholder: "Nome (es. Zucchero)", style: { width: "100%", padding: "10px", borderRadius: 8, border: "1px solid " + T.bordo, background: T.scuro ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.7)", fontSize: 13, color: T.testo, marginBottom: 10 } }),
@@ -749,8 +749,8 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
           ? React.createElement("p", { style: { fontSize: 12, color: T.tenue } }, "Ancora niente da segnare.")
           : React.createElement(SettimanaCalendario, {
               voci: storico,
-              emojiDi: (v) => (TUTTI[v.tipo] || { emoji: "â¢" }).emoji,
-              etichettaDi: (v) => (TUTTI[v.tipo] || { label: "Vizio" }).label + "  " + (v.vita >= 0 ? "+" : "â") + formatDays(Math.abs(v.vita)),
+              emojiDi: (v) => (TUTTI[v.tipo] || { emoji: "•" }).emoji,
+              etichettaDi: (v) => (TUTTI[v.tipo] || { label: "Vizio" }).label + "  " + (v.vita >= 0 ? "+" : "−") + formatDays(Math.abs(v.vita)),
               T: T,
               puoiCancellare: (v) => (Date.now() - new Date(v.data).getTime()) < 60000,
               onCancella: (v) => {
@@ -783,8 +783,8 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
       const aggiungiAmico = () => {
         const c = nuovoCodice.trim().toUpperCase();
         if (!c) return;
-        if (c === profile.codice) { setAvviso("Questo Ã¨ il tuo codice!"); return; }
-        if (codici.includes(c)) { setAvviso("Amico giÃ  collegato"); return; }
+        if (c === profile.codice) { setAvviso("Questo è il tuo codice!"); return; }
+        if (codici.includes(c)) { setAvviso("Amico già collegato"); return; }
         if (codici.length >= 10) { setAvviso("Massimo 10 amici"); return; }
         setProfile({ ...profile, codiciAmici: [...codici, c], codiceAmico: undefined });
         setNuovoCodice(""); setAvviso("");
@@ -799,17 +799,17 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         const animale = dati && ANIMALS.find(a => a.id === dati.animalId);
         const vitaPerc = dati ? Math.max(0, Math.min(100, ((dati.vitaDays || 0) / MAX_VITA_DAYS) * 100)) : 0;
         return React.createElement("div", { key: codice, style: { background: T.cardSoft, borderRadius: 14, padding: 14, marginBottom: 10, border: "1px solid " + T.bordo, position: "relative" } },
-          React.createElement("button", { onClick: () => scollega(codice), title: "Scollega", style: { position: "absolute", top: 8, right: 10, background: "transparent", border: "none", color: T.tenue, fontSize: 16, cursor: "pointer" } }, "Ã"),
+          React.createElement("button", { onClick: () => scollega(codice), title: "Scollega", style: { position: "absolute", top: 8, right: 10, background: "transparent", border: "none", color: T.tenue, fontSize: 16, cursor: "pointer" } }, "×"),
           !dati
             ? React.createElement("div", { style: { textAlign: "center" } },
                 React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: T.testo, marginBottom: 2 } }, codice),
-                React.createElement("div", { style: { fontSize: 11, color: T.tenue } }, statoCloud === "offline" ? "Server non raggiungibile" : "In attesaâ¦ (l'amico deve aprire l'app)")
+                React.createElement("div", { style: { fontSize: 11, color: T.tenue } }, statoCloud === "offline" ? "Server non raggiungibile" : "In attesa… (l'amico deve aprire l'app)")
               )
             : React.createElement("div", { style: { textAlign: "center" } },
-                React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginBottom: 4 } }, "Cucciolo di " + (dati.mioNome || "â¦")),
-                React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: T.testo, marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, dati.nomeCucciolo || "â"),
+                React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginBottom: 4 } }, "Cucciolo di " + (dati.mioNome || "…")),
+                React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: T.testo, marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, dati.nomeCucciolo || "—"),
                 animale && React.createElement("img", { src: animale.img, alt: "", style: { width: "min(130px, 38vw)", height: "min(130px, 38vw)", objectFit: "contain", display: "block", margin: "0 auto 10px" } }),
-                React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 6 } }, stageFor(dati.points || 0).label + " Â· â­ " + (dati.points || 0)),
+                React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 6 } }, stageFor(dati.points || 0).label + " · ⭐ " + (dati.points || 0)),
                 React.createElement("div", { style: { background: T.scuro ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.06)", borderRadius: 10, height: 16, overflow: "hidden", marginBottom: 6 } },
                   React.createElement("div", { style: { background: vitaPerc > 40 ? T.accento : T.tenue, height: "100%", width: vitaPerc + "%" } })
                 ),
@@ -823,12 +823,12 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
       };
 
       return React.createElement("div", { style: { padding: "4px 4px" } },
-        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "I tuoi amici ð¥"),
+        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "I tuoi amici 👥"),
 
         React.createElement("div", { style: { background: T.card, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
-          React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginBottom: 6 } }, "Il tuo codice â dallo ai tuoi amici"),
-          React.createElement("div", { style: { fontSize: 24, fontWeight: 700, color: T.testo, letterSpacing: 1, marginBottom: 10, fontFamily: "'Fredoka', sans-serif" } }, profile.codice || "â"),
-          React.createElement("button", { onClick: copia, style: { background: T.accento, color: T.suAccento, border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, copiato ? "Copiato â" : "Copia codice")
+          React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginBottom: 6 } }, "Il tuo codice — dallo ai tuoi amici"),
+          React.createElement("div", { style: { fontSize: 24, fontWeight: 700, color: T.testo, letterSpacing: 1, marginBottom: 10, fontFamily: "'Fredoka', sans-serif" } }, profile.codice || "—"),
+          React.createElement("button", { onClick: copia, style: { background: T.accento, color: T.suAccento, border: "none", borderRadius: 10, padding: "8px 16px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, copiato ? "Copiato ✓" : "Copia codice")
         ),
 
         // Campo aggiungi amico
@@ -843,13 +843,13 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
 
         codici.length === 0
           ? React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 16, textAlign: "center", border: "1px solid " + T.bordo } },
-              React.createElement("div", { style: { fontSize: 34, marginBottom: 8 } }, "ð"),
+              React.createElement("div", { style: { fontSize: 34, marginBottom: 8 } }, "🔗"),
               React.createElement("div", { style: { fontSize: 12, color: T.tenue, lineHeight: 1.6 } }, "Non sei ancora collegata a nessuno. Fatti dare il codice di un amico e aggiungilo qui sopra.")
             )
           : codici.map(c => cardAmico(c)),
 
         React.createElement("div", { style: { fontSize: 10, color: T.tenue, textAlign: "center", marginTop: 14, lineHeight: 1.5 } },
-          statoCloud === "ok" ? "Collegato al server â" : statoCloud === "offline" ? "Non collegato â i dati restano sul telefono" : "Collegamento in corsoâ¦")
+          statoCloud === "ok" ? "Collegato al server ✓" : statoCloud === "offline" ? "Non collegato — i dati restano sul telefono" : "Collegamento in corso…")
       );
     }
 
@@ -858,16 +858,16 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
       const cleanDrinkDays = profile.lastDrink ? Math.floor((new Date() - new Date(profile.lastDrink)) / (1000 * 60 * 60 * 24)) : -1;
 
       return React.createElement("div", { style: { padding: "4px 4px" } },
-        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "Le tue statistiche ð"),
+        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "Le tue statistiche 📊"),
         React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 12, border: "1px solid rgba(69, 214, 181, 0.3)" } },
           React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Giorni senza fumare"),
-          React.createElement("div", { style: { fontSize: 28, fontWeight: 700, color: T.accento } }, cleanSmokeDays >= 0 ? cleanSmokeDays : "â"),
-          cleanSmokeDays >= 30 && React.createElement("div", { style: { fontSize: 10, color: T.accento, marginTop: 4, fontWeight: 700 } }, "ð +1 anno rigenerato!")
+          React.createElement("div", { style: { fontSize: 28, fontWeight: 700, color: T.accento } }, cleanSmokeDays >= 0 ? cleanSmokeDays : "—"),
+          cleanSmokeDays >= 30 && React.createElement("div", { style: { fontSize: 10, color: T.accento, marginTop: 4, fontWeight: 700 } }, "🎉 +1 anno rigenerato!")
         ),
         React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 12, border: "1px solid rgba(69, 214, 181, 0.3)" } },
           React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Giorni senza bere"),
-          React.createElement("div", { style: { fontSize: 28, fontWeight: 700, color: T.accento } }, cleanDrinkDays >= 0 ? cleanDrinkDays : "â"),
-          cleanDrinkDays >= 7 && React.createElement("div", { style: { fontSize: 10, color: T.accento, marginTop: 4, fontWeight: 700 } }, "ð +1 anno rigenerato!")
+          React.createElement("div", { style: { fontSize: 28, fontWeight: 700, color: T.accento } }, cleanDrinkDays >= 0 ? cleanDrinkDays : "—"),
+          cleanDrinkDays >= 7 && React.createElement("div", { style: { fontSize: 10, color: T.accento, marginTop: 4, fontWeight: 700 } }, "🎉 +1 anno rigenerato!")
         ),
         React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, border: "1px solid " + T.bordo } },
           React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Traguardi totali"),
@@ -877,7 +877,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
     }
 
     // Temi: sfumature delicate, testo sempre leggibile
-    // Ogni tema declina TUTTO nelle sue tonalitÃ : niente colori scoordinati.
+    // Ogni tema declina TUTTO nelle sue tonalità: niente colori scoordinati.
     // card = riquadro pieno, cardSoft = riquadro tenue, testo/tenue, bordo,
     // accento = colore forte per pulsanti/evidenze, suAccento = testo sopra l'accento.
     const TEMI = {
@@ -953,7 +953,7 @@ const VIZI_TUTTI_S = Object.assign({}, VIZI_TIPI, viziPersonali_S);
 const viziNascosti_S = profile.viziNascosti || [];
 
       return React.createElement("div", { style: { padding: "4px 4px" } },
-        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "Impostazioni âï¸"),
+        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "Impostazioni ⚙️"),
 
         // Da quanto tempo
         React.createElement("div", { style: { background: T.card, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid rgba(255,230,196,0.4)", textAlign: "center" } },
@@ -971,7 +971,7 @@ React.createElement("button", { onClick: onSignOut, style: { background: "transp
 )
 : React.createElement("div", null,
 React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 8 } }, "Collega un account Google per non perdere mai il tuo cucciolo"),
-React.createElement("button", { onClick: onGoogleLogin, disabled: accessoInCorso, style: { background: "#ffffff", color: T.testo, border: "1px solid " + T.bordo, borderRadius: 10, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: accessoInCorso ? "default" : "pointer" } }, accessoInCorso ? "Accesso in corsoâ¦" : "ðµ Accedi con Google")
+React.createElement("button", { onClick: onGoogleLogin, disabled: accessoInCorso, style: { background: "#ffffff", color: T.testo, border: "1px solid " + T.bordo, borderRadius: 10, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: accessoInCorso ? "default" : "pointer" } }, accessoInCorso ? "Accesso in corso…" : "🔵 Accedi con Google")
 )
 ),
 
@@ -991,14 +991,14 @@ React.createElement("button", { onClick: onGoogleLogin, disabled: accessoInCorso
         ),
 
 (tragNascosti_S.length > 0 || viziNascosti_S.length > 0) && React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
-React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "Nascosti â tocca per rimettere"),
+React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "Nascosti — tocca per rimettere"),
 tragNascosti_S.length > 0 && React.createElement("div", { style: { marginBottom: viziNascosti_S.length > 0 ? 10 : 0 } },
 React.createElement("div", { style: { fontSize: 10, color: T.tenue, marginBottom: 6 } }, "Traguardi"),
 React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 } },
 tragNascosti_S.map(key => {
 const t = MILESTONE_TUTTI_S[key];
 if (!t) return null;
-return React.createElement("button", { key: "tg_" + key, onClick: () => setProfile({ ...profile, traguardiNascosti: tragNascosti_S.filter(x => x !== key) }), style: { background: "transparent", border: "1px solid " + T.bordo, borderRadius: 8, padding: "6px 10px", fontSize: 12, color: T.testo, cursor: "pointer" } }, t.emoji + " " + t.label + " ï¼");
+return React.createElement("button", { key: "tg_" + key, onClick: () => setProfile({ ...profile, traguardiNascosti: tragNascosti_S.filter(x => x !== key) }), style: { background: "transparent", border: "1px solid " + T.bordo, borderRadius: 8, padding: "6px 10px", fontSize: 12, color: T.testo, cursor: "pointer" } }, t.emoji + " " + t.label + " ＋");
 })
 )
 ),
@@ -1008,7 +1008,7 @@ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 
 viziNascosti_S.map(tipo => {
 const t = VIZI_TUTTI_S[tipo];
 if (!t) return null;
-return React.createElement("button", { key: "vz_" + tipo, onClick: () => setProfile({ ...profile, viziNascosti: viziNascosti_S.filter(x => x !== tipo) }), style: { background: "transparent", border: "1px solid " + T.bordo, borderRadius: 8, padding: "6px 10px", fontSize: 12, color: T.testo, cursor: "pointer" } }, t.emoji + " " + t.label + " ï¼");
+return React.createElement("button", { key: "vz_" + tipo, onClick: () => setProfile({ ...profile, viziNascosti: viziNascosti_S.filter(x => x !== tipo) }), style: { background: "transparent", border: "1px solid " + T.bordo, borderRadius: 8, padding: "6px 10px", fontSize: 12, color: T.testo, cursor: "pointer" } }, t.emoji + " " + t.label + " ＋");
 })
 )
 )
@@ -1016,14 +1016,14 @@ return React.createElement("button", { key: "vz_" + tipo, onClick: () => setProf
 
 // Guida: come funziona
         React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
-          React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "Come funziona ð"),
+          React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "Come funziona 📖"),
           [
-            ["ð  Casa", "Vedi il tuo cucciolo, la sua vita (max 20 anni) e i punti. La vita cala coi vizi e cresce coi traguardi."],
-            ["ð¯ Traguardi", "Segna studio, sonno, esami, igiene e sport: ognuno aggiunge vita e punti. Ci sono limiti al giorno. L'esame dÃ  vita in base al voto, la bocciatura la toglie. Puoi crearne di tuoi."],
-            ["ð¬ Vizi & Sfizi", "Ogni vizio toglie mesi di vita (il sesso ne aggiunge). Ogni tocco finisce nel calendario con data e ora. Puoi aggiungere vizi tuoi con emoji e mesi."],
-            ["ð¥ Amico", "Dai il tuo codice al partner e inserisci il suo: vedrete il cucciolo l'uno dell'altra, che si aggiorna da solo."],
-            ["ð Stats", "I tuoi numeri: giorni senza fumare o bere e traguardi totali."],
-            ["âï¸ Impostazioni", "Cambia tema, vedi da quanto hai il cucciolo, o ricomincia da capo."],
+            ["🏠 Casa", "Vedi il tuo cucciolo, la sua vita (max 20 anni) e i punti. La vita cala coi vizi e cresce coi traguardi."],
+            ["🎯 Traguardi", "Segna studio, sonno, esami, igiene e sport: ognuno aggiunge vita e punti. Ci sono limiti al giorno. L'esame dà vita in base al voto, la bocciatura la toglie. Puoi crearne di tuoi."],
+            ["🚬 Vizi & Sfizi", "Ogni vizio toglie mesi di vita (il sesso ne aggiunge). Ogni tocco finisce nel calendario con data e ora. Puoi aggiungere vizi tuoi con emoji e mesi."],
+            ["👥 Amico", "Dai il tuo codice al partner e inserisci il suo: vedrete il cucciolo l'uno dell'altra, che si aggiorna da solo."],
+            ["📊 Stats", "I tuoi numeri: giorni senza fumare o bere e traguardi totali."],
+            ["⚙️ Impostazioni", "Cambia tema, vedi da quanto hai il cucciolo, o ricomincia da capo."],
           ].map((riga, i) => React.createElement("div", { key: i, style: { marginBottom: 8 } },
             React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo } }, riga[0]),
             React.createElement("div", { style: { fontSize: 11, color: T.tenue, lineHeight: 1.5 } }, riga[1])
@@ -1033,7 +1033,7 @@ return React.createElement("button", { key: "vz_" + tipo, onClick: () => setProf
         // Reset
         React.createElement("div", { style: { background: "rgba(255,111,176,0.12)", borderRadius: 12, padding: 14, border: "1px solid rgba(255,111,176,0.3)" } },
           React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo, marginBottom: 6 } }, "Ricomincia da capo"),
-          React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginBottom: 10, lineHeight: 1.5 } }, "Azzera il cucciolo e tutti i progressi. Non si puÃ² annullare."),
+          React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginBottom: 10, lineHeight: 1.5 } }, "Azzera il cucciolo e tutti i progressi. Non si può annullare."),
           !confermaReset
             ? React.createElement("button", { onClick: () => setConfermaReset(true), style: { background: "rgba(255,111,176,0.25)", color: "#C0447A", border: "none", borderRadius: 10, padding: "9px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "Resetta cucciolo")
             : React.createElement("div", null,
@@ -1082,7 +1082,7 @@ const [accessoInCorso, setAccessoInCorso] = useState(false);
             if (p && !p.codice) {
               p.codice = generaCodice(p.nomeCucciolo || p.petName);
             }
-            // Profili senza data di nascita: la fissiamo ora, cosÃ¬ l'etÃ  puÃ² avanzare
+            // Profili senza data di nascita: la fissiamo ora, così l'età può avanzare
             if (p && !p.dataInizio) {
               p.dataInizio = new Date().toISOString();
             }
@@ -1116,10 +1116,10 @@ const [accessoInCorso, setAccessoInCorso] = useState(false);
       }, []);
 
       // RECUPERO: se il telefono ha perso i dati (nessun profilo) ma conosco il mio codice,
-      // riscarico il backup completo dal server. Non sovrascrive mai un profilo giÃ  presente.
+      // riscarico il backup completo dal server. Non sovrascrive mai un profilo già presente.
       useEffect(() => {
         if (statoCloud !== "ok" || !loaded) return;
-        if (profile) return;                        // ho giÃ  dati locali: non tocco niente
+        if (profile) return;                        // ho già dati locali: non tocco niente
         const login = datiLogin;
         if (!login || !login.codice) return;        // non so chi sono, non posso recuperare
         let annullato = false;
@@ -1156,7 +1156,7 @@ const [accessoInCorso, setAccessoInCorso] = useState(false);
           cigarettes: profile.cigarettes || 0,
           drinks: profile.drinks || 0,
           sesso: profile.sesso || 0,
-          // conteggio di ogni tipo di vizio, cosÃ¬ l'amico li vede tutti
+          // conteggio di ogni tipo di vizio, così l'amico li vede tutti
           viziConteggi: Object.keys(VIZI_TIPI).reduce((acc, tipo) => {
             acc[tipo] = (profile.viziLog || []).filter(v => v.tipo === tipo).length;
             return acc;
@@ -1301,12 +1301,12 @@ const completaLogin = (dati) => {
       return React.createElement("div", { style: { fontFamily: "'Quicksand', sans-serif", background: T.tinta, height: "100%", width: "100%", maxWidth: 560, margin: "0 auto", display: "flex", flexDirection: "column", color: T.testo, overflow: "hidden" } },
         askChange && React.createElement("div", { style: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(74,58,107,0.35)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 24 } },
           React.createElement("div", { style: { background: "#fff", borderRadius: 20, padding: 24, maxWidth: 320, width: "100%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.25)" } },
-            React.createElement("div", { style: { fontSize: 40, marginBottom: 8 } }, "ð¾"),
+            React.createElement("div", { style: { fontSize: 40, marginBottom: 8 } }, "🐾"),
             React.createElement("h2", { style: { fontSize: 18, fontWeight: 700, color: "#4A3A6B", marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, "Cambiare animale?"),
             React.createElement("p", { style: { fontSize: 12, color: "#8F84B0", marginBottom: 20, lineHeight: 1.5 } }, "Tornerai alla scelta dell'animale. I progressi di " + animal.name + " restano salvati e li ritrovi se lo riscegli."),
             React.createElement("div", { style: { display: "flex", gap: 10 } },
               React.createElement("button", { onClick: () => setAskChange(false), style: { flex: 1, background: "rgba(180,165,214,0.15)", color: "#8F84B0", border: "none", borderRadius: 14, padding: "12px 0", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Quicksand', sans-serif" } }, "No"),
-              React.createElement("button", { onClick: () => { try { localStorage.removeItem("pet-animal"); } catch (e) {} setAskChange(false); setAnimal(null); setTab("home"); }, style: { flex: 1, background: "linear-gradient(135deg, #FFC53D, #FFD966)", color: "#4A3A6B", border: "none", borderRadius: 14, padding: "12px 0", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Quicksand', sans-serif" } }, "SÃ¬")
+              React.createElement("button", { onClick: () => { try { localStorage.removeItem("pet-animal"); } catch (e) {} setAskChange(false); setAnimal(null); setTab("home"); }, style: { flex: 1, background: "linear-gradient(135deg, #FFC53D, #FFD966)", color: "#4A3A6B", border: "none", borderRadius: 14, padding: "12px 0", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "'Quicksand', sans-serif" } }, "Sì")
             )
           )
         ),
@@ -1316,14 +1316,14 @@ const completaLogin = (dati) => {
             React.createElement("div", { style: { fontSize: 11, color: T.tenue } }, stage.label)
           ),
           React.createElement("div", { style: { display: "flex", gap: 8 } },
-            React.createElement("button", { onClick: () => setTab("impostazioni"), style: { background: T.cardSoft, border: "1px solid " + T.bordo, borderRadius: 12, padding: "8px 11px", fontSize: 14, cursor: "pointer" } }, "âï¸"),
+            React.createElement("button", { onClick: () => setTab("impostazioni"), style: { background: T.cardSoft, border: "1px solid " + T.bordo, borderRadius: 12, padding: "8px 11px", fontSize: 14, cursor: "pointer" } }, "⚙️"),
             React.createElement("button", { onClick: () => setAskChange(true), style: { background: T.cardSoft, border: "1px solid " + T.bordo, borderRadius: 12, padding: "8px 12px", fontSize: 11, fontWeight: 700, color: T.accento, cursor: "pointer", fontFamily: "'Quicksand', sans-serif" } }, "Cambia")
           )
         ),
         React.createElement("div", { style: { flex: 1, background: T.pannello, backdropFilter: "blur(10px)", borderRadius: "24px 24px 0 0", padding: "20px 18px", overflowY: "auto", WebkitOverflowScrolling: "touch", overscrollBehavior: "contain", borderTop: "1px solid " + T.bordo } },
           isDead ? React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", textAlign: "center" } },
-            React.createElement("div", { style: { fontSize: 64, marginBottom: 12 } }, "ð"),
-            React.createElement("h2", { style: { fontSize: 20, fontWeight: 700, color: T.testo, marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, animal.name + " se ne Ã¨ andato..."),
+            React.createElement("div", { style: { fontSize: 64, marginBottom: 12 } }, "😔"),
+            React.createElement("h2", { style: { fontSize: 20, fontWeight: 700, color: T.testo, marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, animal.name + " se ne è andato..."),
             React.createElement("button", { style: { marginTop: 24, background: T.accento, color: T.suAccento, border: "none", borderRadius: 18, padding: "11px 28px", fontWeight: 700, cursor: "pointer", fontFamily: "'Quicksand', sans-serif" }, onClick: () => { setAnimal(null); saveProfile(null); } }, "Ricominciare")
           ) : tab === "home" ? React.createElement(Home, { profile, stage, animal, T }) : tab === "traguardi" ? React.createElement(Traguardi, { profile, setProfile: saveProfile, T }) : tab === "vizi" ? React.createElement(ViziSfizi, { profile, setProfile: saveProfile, T }) : tab === "amico" ? React.createElement(Amico, { profile, amiciDati, statoCloud, setProfile: saveProfile, T }) : tab === "impostazioni" ? React.createElement(Impostazioni, { profile, animal, cambiaTema, resetCucciolo, T, setProfile: saveProfile, cloudUser, onGoogleLogin: accediConGoogle, onSignOut: disconnettiGoogle, accessoInCorso }) : React.createElement(Statistiche, { profile, T })
         ),
