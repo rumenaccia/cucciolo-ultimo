@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-  <meta name="description" content="Cucciolo - Il tuo animale domestico che cresce">
+  <meta name="description" content="ViceVersa - Il tuo animale domestico che cresce">
   <meta name="theme-color" content="#FFE3F1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Cucciolo">
+  <meta name="apple-mobile-web-app-title" content="ViceVersa">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="ragdoll.PNG">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><text x='50%' y='50%' font-size='120' text-anchor='middle' dominant-baseline='middle'>🐱</text></svg>">
-  <title>Cucciolo - Il tuo animale</title>
+  <title>ViceVersa - Il tuo animale</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -193,17 +193,106 @@ leggiAccount: async (uid) => { try { const s = await getDoc(doc(db, "utenti", ui
     ];
 
     const MOTIVATIONAL_QUOTES = [
-      "Oggi è un giorno perfetto per non fumare! 💪",
-      "L'acqua è la miglior medicina. Bevi! 💧",
-      "Mangia bene, il tuo animale ti ringrazierà 🥗",
-      "Ogni traguardo è un passo verso la felicità ⭐",
-      "Prendersi cura di te = prendersi cura di lui 💚",
-      "Non fumare oggi = +2 anni per il tuo animale 🎉",
-      "Un drink in meno = salute in più 🌟",
-      "Il tuo animale crede in te! 🐾",
-      "Riposa bene, recupera le forze 😴",
-      "Muoviti un po'! Il tuo corpo e il tuo animale ringraziano 🏃",
-    ];
+"Oggi è un giorno perfetto per non fumare! 💪",
+"L'acqua è la miglior medicina. Bevi! 💧",
+"Mangia bene, il tuo animale ti ringrazierà 🥗",
+"Ogni traguardo è un passo verso la felicità ⭐",
+"Prendersi cura di te = prendersi cura di lui 💚",
+"Non fumare oggi = +2 anni per il tuo animale 🎉",
+"Un drink in meno = salute in più 🌟",
+"Il tuo animale crede in te! 🐾",
+"Riposa bene, recupera le forze 😴",
+"Muoviti un po'! Il tuo corpo e il tuo animale ringraziano 🏃",
+"Un passo alla volta, ma sempre avanti 👣",
+"Sei più forte di ogni tua scusa 🔥",
+"La costanza batte la motivazione, ogni giorno 📆",
+"Piccoli gesti, grandi risultati 🌱",
+"Oggi scegli te stesso, non il vizio 🙏",
+"Ogni no che dici a un vizio è un sì alla tua vita 🎯",
+"Il progresso non è lineare, e va bene così 📈",
+"Sii gentile con te stesso, stai facendo del tuo meglio 💛",
+"Anche i giorni difficili finiscono 🌙",
+"Respira, conta fino a dieci, poi scegli bene 🌬️",
+"Chi resiste oggi, festeggia domani 🥳",
+"Non è debolezza chiedere aiuto, è coraggio 🤝",
+"Il tuo animale invecchia più lentamente quando tu stai bene 🐶",
+"Le buone abitudini si costruiscono un giorno alla volta 🧱",
+"Sostituisci un vizio con un sorriso, funziona 😊",
+"Bevi un bicchiere d'acqua invece di una sigaretta 🚰",
+"Fai una passeggiata, schiarisce la mente 🚶",
+"Studiare oggi è un regalo per il te di domani 📚",
+"Dormire bene è un atto di amore verso te stesso 🛌",
+"L'igiene quotidiana è un piccolo rito di rispetto per te 🧼",
+"Un esame superato vale più di mille scuse 🎓",
+"Fai qualcosa oggi che il te di ieri non avrebbe fatto 🚀",
+"La disciplina è la libertà più grande che esista 🔓",
+"Non contare i giorni, fai in modo che i giorni contino 📅",
+"Ogni traguardo raggiunto è una vittoria silenziosa 🏆",
+"Sei l'allenatore del tuo animale e di te stesso 🎖️",
+"Meno vizi, più anni insieme al tuo cucciolo 🐾",
+"Oggi puoi essere la versione migliore di te 🌈",
+"Un giorno pulito è un giorno guadagnato 🧽",
+"Le abitudini sane sono un investimento a lungo termine 💰",
+"Anche il tuo animale ha bisogno di te sobrio e presente 🐕",
+"Rallenta, respira, e scegli con calma 🍃",
+"Non serve essere perfetti, basta essere costanti 🔁",
+"Sii orgoglioso di ogni piccolo no che ti sei detto 👏",
+"La forza di volontà è un muscolo: allenala ogni giorno 💪",
+"Fatti una doccia, cambia l'umore 🚿",
+"Un allenamento vale più di mille pensieri negativi 🏋️",
+"La cura di sé non è egoismo, è sopravvivenza 🌸",
+"Ogni traguardo personalizzato è un pezzo di te che cresce 🧩",
+"Ricorda perché hai iniziato questo percorso 🧭",
+"Non tutti i giorni saranno facili, ma ne varrà la pena 🌤️",
+"Bevi meno, ama di più 💞",
+"Fuma di meno, vivi di più 🌬️",
+"Il tuo corpo ti ascolta: parlagli con gentilezza 🗣️",
+"Le tue scelte di oggi sono i tuoi risultati di domani 🔮",
+"Anche un solo giorno senza vizi conta tantissimo 🎈",
+"Sii la persona che il tuo animale pensa che tu sia 🐺",
+"Datti tempo, ogni cambiamento vero richiede pazienza ⏳",
+"Un obiettivo scritto è già mezzo raggiunto ✍️",
+"La salute è la prima ricchezza da custodire 🏅",
+"Fai pace con i tuoi errori, ma continua a camminare 🕊️",
+"Bevi acqua prima di ogni tentazione, aiuta davvero 💧",
+"Il tuo cucciolo ti guarda e impara da te 🐕‍🦺",
+"Ogni traguardo raggiunto allontana la stanchezza 🌟",
+"Sii fiero di ogni piccolo passo avanti 🐣",
+"Le abitudini che scegli oggi, ti accompagneranno per anni 🌳",
+"Non serve la perfezione, serve la direzione giusta 🧭",
+"Un pensiero positivo al giorno cambia la giornata ☀️",
+"Sii paziente con te stesso come lo saresti con un cucciolo 🐕",
+"Fermati un attimo, respira, poi decidi con lucidità 🌬️",
+"Ogni vizio evitato è un mattoncino di libertà in più 🧱",
+"Il cambiamento inizia sempre da una scelta piccola 🌱",
+"Prenditi cura del tuo corpo, è l'unico posto dove vivi 🏠",
+"Oggi conta più di ieri, e domani conterà più di oggi 📊",
+"Sorridi: hai già fatto un passo importante leggendo questo 😄",
+"Non arrenderti mai, il tuo animale conta su di te 🐾",
+"La costanza è un superpotere silenzioso 🦸",
+"Un traguardo raggiunto oggi è un anno di vita in più domani 🎂",
+"Le medicine prese in orario sono un atto di amore per te 💊",
+"Segnare il ciclo ti aiuta a conoscerti meglio 🩷",
+"Prenditi cura della tua salute come cureresti il tuo cucciolo 🩺",
+"Ogni promemoria rispettato è un piccolo successo 🔔",
+"La prevenzione è la miglior forma di cura di sé 🛡️",
+"Un check-up in più, una preoccupazione in meno ✅",
+"Ascolta il tuo corpo, ti parla sempre per primo 👂",
+"Essere costanti con la salute è un regalo a lungo termine 🎁",
+"Non rimandare a domani ciò che il tuo corpo chiede oggi 📌",
+"Il tuo benessere è la base di tutto il resto 🧘",
+"Fai un respiro profondo prima di ogni decisione importante 🌬️",
+"Le buone abitudini oggi sono la salute di domani 🌤️",
+"Anche il riposo è produttivo, concediti di fermarti 🛑",
+"Sii grato per ogni giorno di salute che vivi 🙏",
+"Un obiettivo raggiunto è la prova che puoi farcela ancora 🔓",
+"La cura costante batte lo sforzo occasionale 🐢",
+"Il tuo animale cresce forte quando tu ti prendi cura di te 🐉",
+"Le piccole vittorie quotidiane costruiscono grandi cambiamenti 🧱",
+"Sei già a metà strada solo per aver deciso di provarci 🛤️",
+"Ogni giorno è una nuova occasione per ricominciare 🌅",
+"La versione migliore di te si costruisce un giorno alla volta 🏗️",
+];
 
     const MAX_VITA_DAYS = 7300; // 20 anni = tetto massimo raggiungibile
     const GIORNI_SETTIMANA = 7;
@@ -255,7 +344,7 @@ leggiAccount: async (uid) => { try { const s = await getDoc(doc(db, "utenti", ui
 
       return React.createElement("div", { style: { padding: "40px 22px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", overflowY: "auto", WebkitOverflowScrolling: "touch", textAlign: "center", background: "linear-gradient(135deg, #FFE8F5, #E8F5FF)", paddingTop: "calc(40px + env(safe-area-inset-top))", paddingBottom: "calc(40px + env(safe-area-inset-bottom))" } },
         React.createElement("div", { style: { fontSize: 52, marginBottom: 10 } }, "🐾"),
-        React.createElement("h1", { style: { fontSize: 26, marginBottom: 6, color: "#4A3A6B", fontWeight: 700, fontFamily: "'Fredoka', sans-serif" } }, "Benvenuta in Cucciolo"),
+        React.createElement("h1", { style: { fontSize: 26, marginBottom: 6, color: "#4A3A6B", fontWeight: 700, fontFamily: "'Fredoka', sans-serif" } }, "Benvenuta in ViceVersa"),
         React.createElement("p", { style: { fontSize: 12, color: "#8F84B0", marginBottom: 24, lineHeight: 1.5 } }, "Un compagno che vive 20 anni insieme a te."),
 nomeGoogle
 ? React.createElement("div", { style: { width: "100%", maxWidth: 340, background: "rgba(255,255,255,0.55)", color: "#4A3A6B", border: "1px solid rgba(74,58,107,0.25)", borderRadius: 14, padding: "13px", fontWeight: 700, fontSize: 13, marginBottom: 14 } }, "🐶 Connessa con Google come " + nomeGoogle)
@@ -422,7 +511,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         }
         const points = Math.floor(val * type.perUnit);
         const milestone = { id: uid(), type: typeKey, amount: val, unitLabel: type.unit, points, vita: GIORNI_SETTIMANA, date: isoDaGiorno(giornoScelto) };
-        const newProfile = { ...profile, points: profile.points + points, vitaDays: Math.min(MAX_VITA_DAYS, profile.vitaDays + GIORNI_SETTIMANA), milestones: [milestone, ...(profile.milestones || [])] };
+        const newProfile = { ...profile, points: profile.points + points, vitaDays: profile.vitaDays + GIORNI_SETTIMANA, milestones: [milestone, ...(profile.milestones || [])] };
         setProfile(newProfile);
         setInputValue("");
         setAvviso("");
@@ -437,7 +526,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         const newProfile = {
           ...profile,
           points: Math.max(0, profile.points + g.points),
-          vitaDays: Math.max(0, Math.min(MAX_VITA_DAYS, profile.vitaDays + g.vita)),
+          vitaDays: Math.max(0, profile.vitaDays + g.vita),
           milestones: [milestone, ...(profile.milestones || [])]
         };
         setProfile(newProfile);
@@ -454,7 +543,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         const type = MILESTONE_TUTTI[typeKey];
         const milestone = { id: uid(), type: typeKey, amount: 1, unitLabel: "volta", points: 10, vita: Math.abs(type.vita || GIORNI_SETTIMANA), date: isoDaGiorno(giornoScelto) };
         const nuovaVita = (type.vita || GIORNI_SETTIMANA);
-        const newProfile = { ...profile, points: profile.points + 10, vitaDays: Math.max(0, Math.min(MAX_VITA_DAYS, profile.vitaDays + nuovaVita)), milestones: [milestone, ...(profile.milestones || [])] };
+        const newProfile = { ...profile, points: profile.points + 10, vitaDays: Math.max(0, profile.vitaDays + nuovaVita), milestones: [milestone, ...(profile.milestones || [])] };
         setProfile(newProfile);
         setActiveType(null);
       };
@@ -540,7 +629,7 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
                 const nuove = (profile.milestones || []).filter(x => x.id !== m.id);
                 const vitaTolta = m.vita || 0;
                 const puntiTolti = m.type === "esame" ? (m.points || 0) : (m.points || 0);
-                setProfile({ ...profile, milestones: nuove, vitaDays: Math.max(0, Math.min(MAX_VITA_DAYS, profile.vitaDays - vitaTolta)), points: Math.max(0, profile.points - puntiTolti) });
+                setProfile({ ...profile, milestones: nuove, vitaDays: Math.max(0, profile.vitaDays - vitaTolta), points: Math.max(0, profile.points - puntiTolti) });
               }
             })
       );
@@ -702,7 +791,7 @@ const [condividiCon, setCondividiCon] = useState((codiciAmici && codiciAmici[0])
         const voce = { id: uid(), tipo: tipo, vita: t.vita, data: dataEvento };
         const nuovo = {
           ...profile,
-          vitaDays: Math.max(0, Math.min(MAX_VITA_DAYS, profile.vitaDays + t.vita)),
+          vitaDays: Math.max(0, profile.vitaDays + t.vita),
           viziLog: [voce, ...(profile.viziLog || [])],
         };
         if (tipo === "sigaretta") { nuovo.cigarettes = (profile.cigarettes || 0) + 1; if (!profile.lastSmoke || dataEvento >= profile.lastSmoke) nuovo.lastSmoke = dataEvento; }
@@ -818,7 +907,7 @@ condividiAttivo && React.createElement("span", { style: { fontSize: 11, color: T
               onCancella: (v) => {
                 // rimuove la voce e restituisce la vita che aveva tolto/aggiunto
                 const nuovoLog = (profile.viziLog || []).filter(x => x.id !== v.id);
-                const nuovaVita = Math.max(0, Math.min(MAX_VITA_DAYS, profile.vitaDays - v.vita));
+                const nuovaVita = Math.max(0, profile.vitaDays - v.vita);
                 setProfile({ ...profile, viziLog: nuovoLog, vitaDays: nuovaVita });
               }
             })
@@ -864,7 +953,7 @@ const adesso = new Date().toISOString();
 const voce = { id: uid(), tipo: tipo, vita: t.vita, data: adesso, insiemeCon: codice };
 const nuovo = {
 ...profile,
-vitaDays: Math.max(0, Math.min(MAX_VITA_DAYS, profile.vitaDays + t.vita)),
+vitaDays: Math.max(0, profile.vitaDays + t.vita),
 viziLog: [voce, ...(profile.viziLog || [])],
 };
 if (tipo === "sigaretta") { nuovo.cigarettes = (profile.cigarettes || 0) + 1; nuovo.lastSmoke = adesso; }
@@ -955,28 +1044,206 @@ statoCloud === "ok" ? "Collegato al server ✓" : statoCloud === "offline" ? "No
 );
 }
 
-function Statistiche({ profile, T }) {
-      const cleanSmokeDays = profile.lastSmoke ? Math.floor((new Date() - new Date(profile.lastSmoke)) / (1000 * 60 * 60 * 24)) : -1;
-      const cleanDrinkDays = profile.lastDrink ? Math.floor((new Date() - new Date(profile.lastDrink)) / (1000 * 60 * 60 * 24)) : -1;
 
-      return React.createElement("div", { style: { padding: "4px 4px" } },
-        React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "Le tue statistiche 📊"),
-        React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 12, border: "1px solid rgba(69, 214, 181, 0.3)" } },
-          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Giorni senza fumare"),
-          React.createElement("div", { style: { fontSize: 28, fontWeight: 700, color: T.accento } }, cleanSmokeDays >= 0 ? cleanSmokeDays : "—"),
-          cleanSmokeDays >= 30 && React.createElement("div", { style: { fontSize: 10, color: T.accento, marginTop: 4, fontWeight: 700 } }, "🎉 +1 anno rigenerato!")
-        ),
-        React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 12, border: "1px solid rgba(69, 214, 181, 0.3)" } },
-          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Giorni senza bere"),
-          React.createElement("div", { style: { fontSize: 28, fontWeight: 700, color: T.accento } }, cleanDrinkDays >= 0 ? cleanDrinkDays : "—"),
-          cleanDrinkDays >= 7 && React.createElement("div", { style: { fontSize: 10, color: T.accento, marginTop: 4, fontWeight: 700 } }, "🎉 +1 anno rigenerato!")
-        ),
-        React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, border: "1px solid " + T.bordo } },
-          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Traguardi totali"),
-          React.createElement("div", { style: { fontSize: 24, fontWeight: 700, color: T.tenue } }, (profile.milestones || []).length)
-        )
-      );
-    }
+function formatGiornoBreve(iso) {
+const d = new Date(iso);
+const gg = String(d.getDate()).padStart(2, "0");
+const mm = String(d.getMonth() + 1).padStart(2, "0");
+return gg + "/" + mm + "/" + d.getFullYear();
+}
+
+function Salute({ profile, setProfile, T }) {
+const [giornoCiclo, setGiornoCiclo] = useState(dataInputOggi());
+const [nomeProm, setNomeProm] = useState("");
+const [emojiProm, setEmojiProm] = useState("💊");
+const [intervalloProm, setIntervalloProm] = useState("1");
+
+const cicli = (profile.cicli || []).slice().sort((a, b) => new Date(b) - new Date(a));
+const intervalli = [];
+for (let i = 0; i < cicli.length - 1; i++) {
+const diff = Math.round((new Date(cicli[i]) - new Date(cicli[i + 1])) / (1000 * 60 * 60 * 24));
+if (diff > 0 && diff < 90) intervalli.push(diff);
+}
+const mediaCiclo = intervalli.length ? Math.round(intervalli.reduce((a, b) => a + b, 0) / intervalli.length) : 28;
+const ultimoCiclo = cicli[0];
+const prossimoCiclo = ultimoCiclo ? new Date(new Date(ultimoCiclo).getTime() + mediaCiclo * 24 * 60 * 60 * 1000) : null;
+const giorniAlProssimo = prossimoCiclo ? Math.ceil((prossimoCiclo - new Date()) / (1000 * 60 * 60 * 24)) : null;
+
+const registraCiclo = () => {
+const iso = isoDaGiorno(giornoCiclo);
+const giornoPuro = iso.slice(0, 10);
+if (cicli.some(d => d.slice(0, 10) === giornoPuro)) return;
+setProfile({ ...profile, cicli: [...(profile.cicli || []), iso] });
+};
+const cancellaCiclo = (iso) => {
+setProfile({ ...profile, cicli: (profile.cicli || []).filter(d => d !== iso) });
+};
+
+const promemoria = profile.promemoria || [];
+const aggiungiPromemoria = () => {
+if (!nomeProm.trim()) return;
+const giorni = Math.max(1, parseInt(intervalloProm) || 1);
+const nuovo = { id: uid(), nome: nomeProm.trim(), emoji: emojiProm.trim() || "💊", giorni, ultima: new Date().toISOString() };
+setProfile({ ...profile, promemoria: [...promemoria, nuovo] });
+setNomeProm(""); setIntervalloProm("1"); setEmojiProm("💊");
+};
+const segnaFatto = (id) => {
+setProfile({ ...profile, promemoria: promemoria.map(p => p.id === id ? { ...p, ultima: new Date().toISOString() } : p) });
+};
+const cancellaPromemoria = (id) => {
+setProfile({ ...profile, promemoria: promemoria.filter(p => p.id !== id) });
+};
+const statoPromemoria = (p) => {
+const prossima = new Date(new Date(p.ultima).getTime() + p.giorni * 24 * 60 * 60 * 1000);
+const giorni = Math.ceil((prossima - new Date()) / (1000 * 60 * 60 * 24));
+if (giorni <= 0) return { testo: giorni === 0 ? "Da fare oggi" : "In ritardo di " + Math.abs(giorni) + "g", colore: "#FF6B6B" };
+if (giorni === 1) return { testo: "Domani", colore: "#FFB020" };
+return { testo: "Tra " + giorni + " giorni", colore: T.tenue };
+};
+
+const stileCard = { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo };
+const stileInput = { padding: "8px 10px", borderRadius: 8, border: "1px solid " + T.bordo, fontSize: 12, background: T.scuro ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)", color: T.testo };
+
+return React.createElement("div", { style: { padding: "4px 4px" } },
+React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "Salute 🩺"),
+React.createElement("p", { style: { fontSize: 12, color: T.tenue, marginBottom: 12 } }, "Il ciclo e i tuoi impegni ricorrenti, come le medicine."),
+
+React.createElement("div", { style: stileCard },
+React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "🩸 Ciclo"),
+ultimoCiclo
+? React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 6 } }, "Ultimo inizio: " + formatGiornoBreve(ultimoCiclo))
+: React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 6 } }, "Nessun ciclo registrato ancora."),
+prossimoCiclo && React.createElement("div", { style: { fontSize: 12, color: T.accento, fontWeight: 700, marginBottom: 10 } },
+"Stima prossimo: " + formatGiornoBreve(prossimoCiclo.toISOString()) + " (" + (giorniAlProssimo >= 0 ? "tra " + giorniAlProssimo + " giorni" : "in ritardo di " + Math.abs(giorniAlProssimo) + " giorni") + ")"
+),
+React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 10 } },
+React.createElement("input", { type: "date", value: giornoCiclo, max: dataInputOggi(), onChange: e => setGiornoCiclo(e.target.value || dataInputOggi()), style: stileInput }),
+React.createElement("button", { onClick: registraCiclo, style: { background: T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "＋ Registra inizio ciclo")
+),
+cicli.length > 0 && React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
+cicli.slice(0, 6).map(iso => React.createElement("div", { key: iso, style: { display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 11, color: T.tenue } },
+React.createElement("span", null, formatGiornoBreve(iso)),
+React.createElement("span", { onClick: () => cancellaCiclo(iso), style: { cursor: "pointer", color: T.tenue } }, "×")
+))
+)
+),
+
+React.createElement("div", { style: stileCard },
+React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "💊 Promemoria"),
+React.createElement("p", { style: { fontSize: 11, color: T.tenue, marginBottom: 10 } }, "Per impegni che si ripetono nel tempo, come le medicine. Ti avvisa qui nell'app quando è il momento."),
+promemoria.length === 0
+? React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 10 } }, "Nessun promemoria ancora.")
+: React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 } },
+promemoria.map(p => {
+const stato = statoPromemoria(p);
+return React.createElement("div", { key: p.id, style: { display: "flex", alignItems: "center", justifyContent: "space-between", background: T.scuro ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.6)", borderRadius: 10, padding: "8px 10px", gap: 8 } },
+React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 } },
+React.createElement("span", { style: { fontSize: 18 } }, p.emoji),
+React.createElement("div", null,
+React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo } }, p.nome),
+React.createElement("div", { style: { fontSize: 10, color: stato.colore, fontWeight: 700 } }, stato.testo + " · ogni " + p.giorni + "g")
+)
+),
+React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
+React.createElement("button", { onClick: () => segnaFatto(p.id), style: { background: T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "6px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer" } }, "Fatto oggi"),
+React.createElement("span", { onClick: () => cancellaPromemoria(p.id), style: { cursor: "pointer", color: T.tenue, fontSize: 14 } }, "×")
+)
+);
+})
+),
+React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap" } },
+React.createElement("input", { value: emojiProm, onChange: e => setEmojiProm(e.target.value), placeholder: "💊", style: { ...stileInput, width: 44, textAlign: "center" } }),
+React.createElement("input", { value: nomeProm, onChange: e => setNomeProm(e.target.value), placeholder: "Es. Medicina", style: { ...stileInput, flex: 1, minWidth: 100 } }),
+React.createElement("input", { type: "number", min: "1", value: intervalloProm, onChange: e => setIntervalloProm(e.target.value), placeholder: "Giorni", style: { ...stileInput, width: 64 } }),
+React.createElement("button", { onClick: aggiungiPromemoria, style: { background: T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "＋ Aggiungi")
+)
+)
+);
+}
+
+function Statistiche({ profile, setProfile, T }) {
+const cleanSmokeDays = profile.lastSmoke ? Math.floor((new Date() - new Date(profile.lastSmoke)) / (1000 * 60 * 60 * 24)) : -1;
+const cleanDrinkDays = profile.lastDrink ? Math.floor((new Date() - new Date(profile.lastDrink)) / (1000 * 60 * 60 * 24)) : -1;
+const [nomeObiettivo, setNomeObiettivo] = useState("");
+const [emojiObiettivo, setEmojiObiettivo] = useState("🎯");
+const [targetObiettivo, setTargetObiettivo] = useState("10");
+const [bonusObiettivo, setBonusObiettivo] = useState("14");
+
+const obiettivi = profile.obiettivi || [];
+
+const aggiungiObiettivo = () => {
+if (!nomeObiettivo.trim()) return;
+const target = Math.max(1, parseInt(targetObiettivo) || 1);
+const vitaBonus = Math.max(0, parseInt(bonusObiettivo) || 0);
+const nuovo = { id: uid(), nome: nomeObiettivo.trim(), emoji: emojiObiettivo.trim() || "🎯", target, progresso: 0, completato: false, vitaBonus };
+setProfile({ ...profile, obiettivi: [...obiettivi, nuovo] });
+setNomeObiettivo(""); setTargetObiettivo("10"); setBonusObiettivo("14"); setEmojiObiettivo("🎯");
+};
+
+const incrementaObiettivo = (id) => {
+const o = obiettivi.find(x => x.id === id);
+if (!o || o.completato) return;
+const progresso = o.progresso + 1;
+const completato = progresso >= o.target;
+const nuoviObiettivi = obiettivi.map(x => x.id === id ? { ...x, progresso, completato } : x);
+const bonus = completato ? o.vitaBonus : 0;
+setProfile({ ...profile, obiettivi: nuoviObiettivi, vitaDays: Math.max(0, profile.vitaDays + bonus), points: profile.points + (completato ? 25 : 1) });
+};
+
+const cancellaObiettivo = (id) => {
+setProfile({ ...profile, obiettivi: obiettivi.filter(x => x.id !== id) });
+};
+
+return React.createElement("div", { style: { padding: "4px 4px" } },
+React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "I tuoi dati 📊"),
+React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 12, border: "1px solid rgba(69, 214, 181, 0.3)" } },
+React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Giorni senza fumare"),
+React.createElement("div", { style: { fontSize: 28, fontWeight: 700, color: T.accento } }, cleanSmokeDays >= 0 ? cleanSmokeDays : "—"),
+cleanSmokeDays >= 30 && React.createElement("div", { style: { fontSize: 10, color: T.accento, marginTop: 4, fontWeight: 700 } }, "🎉 +1 anno rigenerato!")
+),
+React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 12, border: "1px solid rgba(69, 214, 181, 0.3)" } },
+React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Giorni senza bere"),
+React.createElement("div", { style: { fontSize: 28, fontWeight: 700, color: T.accento } }, cleanDrinkDays >= 0 ? cleanDrinkDays : "—"),
+cleanDrinkDays >= 7 && React.createElement("div", { style: { fontSize: 10, color: T.accento, marginTop: 4, fontWeight: 700 } }, "🎉 +1 anno rigenerato!")
+),
+React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
+React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: T.testo, marginBottom: 8 } }, "Traguardi totali"),
+React.createElement("div", { style: { fontSize: 24, fontWeight: 700, color: T.tenue } }, (profile.milestones || []).length)
+),
+
+React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, border: "1px solid " + T.bordo } },
+React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: T.testo, marginBottom: 4 } }, "🏆 Obiettivi personalizzati"),
+React.createElement("p", { style: { fontSize: 11, color: T.tenue, marginBottom: 10 } }, "Crea un obiettivo tuo: quando lo raggiungi, guadagni punti vita in più."),
+obiettivi.length === 0
+? React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 12 } }, "Nessun obiettivo ancora.")
+: React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10, marginBottom: 12 } },
+obiettivi.map(o => {
+const perc = Math.max(0, Math.min(100, (o.progresso / o.target) * 100));
+return React.createElement("div", { key: o.id, style: { background: T.scuro ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.6)", borderRadius: 10, padding: 10 } },
+React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 } },
+React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo } }, o.emoji + " " + o.nome),
+React.createElement("span", { onClick: () => cancellaObiettivo(o.id), style: { cursor: "pointer", color: T.tenue, fontSize: 14 } }, "×")
+),
+React.createElement("div", { style: { background: T.scuro ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.06)", borderRadius: 6, height: 8, overflow: "hidden", marginBottom: 6 } },
+React.createElement("div", { style: { width: perc + "%", height: "100%", background: o.completato ? "#4CD787" : T.accento, borderRadius: 6 } })
+),
+React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } },
+React.createElement("div", { style: { fontSize: 10, color: T.tenue } }, o.completato ? ("🎉 Completato! Vita +" + o.vitaBonus + "g") : (o.progresso + " / " + o.target)),
+!o.completato && React.createElement("button", { onClick: () => incrementaObiettivo(o.id), style: { background: T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "5px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer" } }, "+1")
+)
+);
+})
+),
+React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap" } },
+React.createElement("input", { value: emojiObiettivo, onChange: e => setEmojiObiettivo(e.target.value), placeholder: "🎯", style: { width: 40, padding: "8px 6px", borderRadius: 8, border: "1px solid " + T.bordo, fontSize: 12, textAlign: "center", background: T.scuro ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)", color: T.testo } }),
+React.createElement("input", { value: nomeObiettivo, onChange: e => setNomeObiettivo(e.target.value), placeholder: "Es. Leggere 10 libri", style: { flex: 1, minWidth: 100, padding: "8px 10px", borderRadius: 8, border: "1px solid " + T.bordo, fontSize: 12, background: T.scuro ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)", color: T.testo } }),
+React.createElement("input", { type: "number", min: "1", value: targetObiettivo, onChange: e => setTargetObiettivo(e.target.value), placeholder: "Volte", style: { width: 60, padding: "8px 6px", borderRadius: 8, border: "1px solid " + T.bordo, fontSize: 12, background: T.scuro ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)", color: T.testo } }),
+React.createElement("input", { type: "number", min: "0", value: bonusObiettivo, onChange: e => setBonusObiettivo(e.target.value), placeholder: "Vita bonus (g)", style: { width: 90, padding: "8px 6px", borderRadius: 8, border: "1px solid " + T.bordo, fontSize: 12, background: T.scuro ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.8)", color: T.testo } }),
+React.createElement("button", { onClick: aggiungiObiettivo, style: { background: T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "＋ Aggiungi obiettivo")
+)
+)
+);
+}
 
     // Temi: sfumature delicate, testo sempre leggibile
     // Ogni tema declina TUTTO nelle sue tonalità: niente colori scoordinati.
@@ -1119,20 +1386,19 @@ return React.createElement("button", { key: "vz_" + tipo, onClick: () => setProf
 // Guida: come funziona
         React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
           React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "Come funziona 📖"),
-          [
-            ["🏠 Casa", "Vedi il tuo cucciolo, la sua vita (max 20 anni) e i punti. La vita cala coi vizi e cresce coi traguardi."],
-            ["🎯 Traguardi", "Segna studio, sonno, esami, igiene e sport: ognuno aggiunge vita e punti. Ci sono limiti al giorno. L'esame dà vita in base al voto, la bocciatura la toglie. Puoi crearne di tuoi."],
-            ["🚬 Vizi & Sfizi", "Ogni vizio toglie mesi di vita (il sesso ne aggiunge). Ogni tocco finisce nel calendario con data e ora. Puoi aggiungere vizi tuoi con emoji e mesi."],
-            ["👥 Amico", "Dai il tuo codice al partner e inserisci il suo: vedrete il cucciolo l'uno dell'altra, che si aggiorna da solo."],
-            ["📊 Stats", "I tuoi numeri: giorni senza fumare o bere e traguardi totali."],
-            ["⚙️ Impostazioni", "Cambia tema, vedi da quanto hai il cucciolo, o ricomincia da capo."],
-          ].map((riga, i) => React.createElement("div", { key: i, style: { marginBottom: 8 } },
-            React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo } }, riga[0]),
-            React.createElement("div", { style: { fontSize: 11, color: T.tenue, lineHeight: 1.5 } }, riga[1])
-          ))
-        ),
-
-        // Reset
+[
+["🏠 Casa", "Vedi il tuo cucciolo, la sua vita e i punti. La vita cala coi vizi e cresce coi traguardi: con abbastanza punti vita può superare anche i 20 anni."],
+["🎯 Traguardi", "Segna studio, sonno, esami, igiene e sport: ognuno aggiunge vita e punti. Ci sono limiti al giorno. L'esame dà vita in base al voto, la bocciatura la toglie. Puoi crearne di tuoi e registrarli anche per giorni passati."],
+["🚬 Vizi & Sfizi", "Ogni vizio toglie mesi di vita (il sesso ne aggiunge). Ogni tocco finisce nel calendario con data e ora. Puoi aggiungere vizi tuoi con emoji e mesi, e registrarli anche per giorni passati."],
+["👥 Amico", "Dai il tuo codice al partner e inserisci il suo: vedrete il cucciolo l'uno dell'altra, che si aggiorna da solo. Da qui potete anche fare qualcosa insieme, condividendo l'evento."],
+["🩺 Salute", "Segna l'inizio del ciclo e ricevi una stima di quando potrebbe tornare. Aggiungi promemoria per impegni che si ripetono, come le medicine: l'app ti avvisa quando è il momento."],
+["📊 Dati", "I tuoi numeri: giorni senza fumare o bere e traguardi totali. Qui puoi anche creare obiettivi tutti tuoi: al raggiungimento guadagni punti vita extra."],
+["⚙️ Impostazioni", "Cambia tema, vedi da quanto hai il cucciolo, o ricomincia da capo."],
+].map((riga, i) => React.createElement("div", { key: i, style: { marginBottom: 8 } },
+React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo } }, riga[0]),
+React.createElement("div", { style: { fontSize: 11, color: T.tenue, lineHeight: 1.5 } }, riga[1])
+))
+),// Reset
         React.createElement("div", { style: { background: "rgba(255,111,176,0.12)", borderRadius: 12, padding: 14, border: "1px solid rgba(255,111,176,0.3)" } },
           React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo, marginBottom: 6 } }, "Ricomincia da capo"),
           React.createElement("div", { style: { fontSize: 11, color: T.tenue, marginBottom: 10, lineHeight: 1.5 } }, "Azzera il cucciolo e tutti i progressi. Non si può annullare."),
@@ -1154,7 +1420,7 @@ return React.createElement("button", { key: "vz_" + tipo, onClick: () => setProf
       );
     }
 
-    const PROFILE_DEFAULTS = { points: 0, vitaDays: MAX_VITA_DAYS, cigarettes: 0, drinks: 0, sesso: 0, viziLog: [], milestones: [], scalaNuova: true };
+    const PROFILE_DEFAULTS = { points: 0, vitaDays: MAX_VITA_DAYS, cigarettes: 0, drinks: 0, sesso: 0, viziLog: [], milestones: [], scalaNuova: true, cicli: [], promemoria: [], obiettivi: [] };
 
     function CucciolataApp() {
       const [profile, setProfile] = useState(null);
@@ -1299,7 +1565,7 @@ let vita = prev.vitaDays;
 let log = prev.viziLog || [];
 let extra = {};
 coda.forEach(ev => {
-vita = Math.max(0, Math.min(MAX_VITA_DAYS, vita + (ev.vita || 0)));
+vita = Math.max(0, vita + (ev.vita || 0));
 log = [{ id: uid(), tipo: ev.tipo, vita: ev.vita, data: new Date().toISOString(), insiemeCon: ev.daNome || "" }, ...log];
 if (ev.tipo === "sigaretta") { extra.cigarettes = (extra.cigarettes ?? prev.cigarettes ?? 0) + 1; extra.lastSmoke = new Date().toISOString(); }
 if (ev.tipo === "drink") { extra.drinks = (extra.drinks ?? prev.drinks ?? 0) + 1; extra.lastDrink = new Date().toISOString(); }
@@ -1459,10 +1725,10 @@ const completaLogin = (dati) => {
             React.createElement("div", { style: { fontSize: 64, marginBottom: 12 } }, "😔"),
             React.createElement("h2", { style: { fontSize: 20, fontWeight: 700, color: T.testo, marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, animal.name + " se ne è andato..."),
             React.createElement("button", { style: { marginTop: 24, background: T.accento, color: T.suAccento, border: "none", borderRadius: 18, padding: "11px 28px", fontWeight: 700, cursor: "pointer", fontFamily: "'Quicksand', sans-serif" }, onClick: () => { setAnimal(null); saveProfile(null); } }, "Ricominciare")
-          ) : tab === "home" ? React.createElement(Home, { profile, stage, animal, T }) : tab === "traguardi" ? React.createElement(Traguardi, { profile, setProfile: saveProfile, T }) : tab === "vizi" ? React.createElement(ViziSfizi, { profile, setProfile: saveProfile, T, codiciAmici: (profile.codiciAmici || (profile.codiceAmico ? [profile.codiceAmico] : [])), mioNome: profile.mioNome, onCondividi: condividiEventoAmico }) : tab === "amico" ? React.createElement(Amico, { profile, amiciDati, statoCloud, setProfile: saveProfile, T, onCondividi: condividiEventoAmico }) : tab === "impostazioni" ? React.createElement(Impostazioni, { profile, animal, cambiaTema, resetCucciolo, T, setProfile: saveProfile, cloudUser, onGoogleLogin: accediConGoogle, onSignOut: disconnettiGoogle, accessoInCorso }) : React.createElement(Statistiche, { profile, T })
+          ) : tab === "home" ? React.createElement(Home, { profile, stage, animal, T }) : tab === "traguardi" ? React.createElement(Traguardi, { profile, setProfile: saveProfile, T }) : tab === "vizi" ? React.createElement(ViziSfizi, { profile, setProfile: saveProfile, T, codiciAmici: (profile.codiciAmici || (profile.codiceAmico ? [profile.codiceAmico] : [])), mioNome: profile.mioNome, onCondividi: condividiEventoAmico }) : tab === "amico" ? React.createElement(Amico, { profile, amiciDati, statoCloud, setProfile: saveProfile, T, onCondividi: condividiEventoAmico }) : tab === "impostazioni" ? React.createElement(Impostazioni, { profile, animal, cambiaTema, resetCucciolo, T, setProfile: saveProfile, cloudUser, onGoogleLogin: accediConGoogle, onSignOut: disconnettiGoogle, accessoInCorso }) : tab === "salute" ? React.createElement(Salute, { profile, setProfile: saveProfile, T }) : React.createElement(Statistiche, { profile, setProfile: saveProfile, T })
         ),
-        !isDead && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(5, 1fr)", background: T.tinta, borderTop: "1px solid " + T.bordo, padding: "10px 8px 16px", gap: 5, flexShrink: 0 } },
-          ["home","traguardi","vizi","amico","stats"].map((id, i) => React.createElement("button", { key: id, onClick: () => setTab(id), style: { background: tab === id ? T.accento : T.cardSoft, color: tab === id ? T.suAccento : T.tenue, border: "1px solid " + (tab === id ? T.accento : T.bordo), borderRadius: 12, padding: "12px 0", cursor: "pointer", fontWeight: tab === id ? 700 : 600, fontFamily: "'Quicksand', sans-serif", fontSize: i >= 3 ? 10 : 11 } }, ["Casa","Traguardi","Vizi","Amico","Stats"][i]))
+        !isDead && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(6, 1fr)", background: T.tinta, borderTop: "1px solid " + T.bordo, padding: "10px 8px 16px", gap: 4, flexShrink: 0 } },
+["home","traguardi","vizi","amico","salute","stats"].map((id, i) => React.createElement("button", { key: id, onClick: () => setTab(id), style: { background: tab === id ? T.accento : T.cardSoft, color: tab === id ? T.suAccento : T.tenue, border: "1px solid " + (tab === id ? T.accento : T.bordo), borderRadius: 12, padding: "12px 0", cursor: "pointer", fontWeight: tab === id ? 700 : 600, fontFamily: "'Quicksand', sans-serif", fontSize: i >= 3 ? 9 : 11 } }, ["Casa","Traguardi","Vizi","Amico","Salute","Dati"][i]))
         )
       );
     }
