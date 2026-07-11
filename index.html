@@ -106,6 +106,24 @@ getRedirectResult(auth).catch(() => {});
         catch (e) { console.log("ascolta:", e); return () => {}; }
       },
 accediGoogle: async () => { await signInWithRedirect(auth, provider); },
+inviaEvento: async (codice, evento) => {
+try {
+const ref = doc(db, "eventi", codice);
+const s = await getDoc(ref);
+const coda = (s.exists() && Array.isArray(s.data().coda)) ? s.data().coda : [];
+coda.push(evento);
+await setDoc(ref, { coda });
+return true;
+} catch (e) { console.log("inviaEvento:", e); return false; }
+},
+ascoltaEventi: (codice, cb) => {
+try { return onSnapshot(doc(db, "eventi", codice), s => cb(s.exists() && Array.isArray(s.data().coda) ? s.data().coda : [])); }
+catch (e) { console.log("ascoltaEventi:", e); return () => {}; }
+},
+svuotaEventi: async (codice, restanti) => {
+try { await setDoc(doc(db, "eventi", codice), { coda: restanti || [] }); return true; }
+catch (e) { console.log("svuotaEventi:", e); return false; }
+},
 esci: async () => { try { await signOut(auth); return true; } catch (e) { console.log("esci:", e); return false; } },
 onUtente: (cb) => onAuthStateChanged(auth, cb),
 salvaAccount: async (uid, dati) => { try { await setDoc(doc(db, "utenti", uid), dati); return true; } catch (e) { console.log("salvaAccount:", e); return false; } },
@@ -643,11 +661,13 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
     // Emoji tra cui scegliere per i vizi personalizzati
     const EMOJI_VIZI = ["🚬","💨","🌿","💊","🍔","🥴","🍷","🍺","🍕","🍫","🍰","🎰","🎮","📱","💻","🛍️","☕","🥤","🍟","🍩","🚗","💸","🃏","📺","🍦","🧁","🍬","🥃","🍸","🎲","🛒","😴"];
 
-    function ViziSfizi({ profile, setProfile, T }) {
+    function ViziSfizi({ profile, setProfile, T, codiciAmici, mioNome, onCondividi }) {
       const [apriForm, setApriForm] = useState(false);
       const [nuovoNome, setNuovoNome] = useState("");
       const [nuovaEmoji, setNuovaEmoji] = useState("");
       const [nuoviMesi, setNuoviMesi] = useState("");
+const [condividiAttivo, setCondividiAttivo] = useState(false);
+const [condividiCon, setCondividiCon] = useState((codiciAmici && codiciAmici[0]) || "");
 
       // Mappa unica: vizi fissi + quelli creati dall'utente
       const personali = profile.viziPersonali || {};
@@ -667,6 +687,9 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
         if (tipo === "drink")     { nuovo.drinks     = (profile.drinks || 0) + 1;     nuovo.lastDrink = voce.data; }
         if (tipo === "sesso")     { nuovo.sesso      = (profile.sesso || 0) + 1;      nuovo.lastSesso = voce.data; }
         setProfile(nuovo);
+if (condividiAttivo && condividiCon && onCondividi) {
+onCondividi(condividiCon, { id: uid(), tipo: tipo, vita: t.vita, daNome: mioNome || "", data: new Date().toISOString() });
+}
       };
 
       const creaVizio = () => {
@@ -710,6 +733,17 @@ React.createElement("div", { style: { fontSize: 10, color: "#8F84B0", marginBott
       return React.createElement("div", { style: { padding: "4px 4px" } },
         React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "Vizi & Sfizi"),
         React.createElement("p", { style: { fontSize: 12, color: T.tenue, marginBottom: 12 } }, "Ogni tocco viene segnato con data e ora."),
+
+codiciAmici && codiciAmici.length > 0 && React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 12, border: "1px solid " + T.bordo, marginBottom: 12, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" } },
+React.createElement("label", { style: { display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 700, color: T.testo, cursor: "pointer" } },
+React.createElement("input", { type: "checkbox", checked: condividiAttivo, onChange: e => setCondividiAttivo(e.target.checked) }),
+"👫 Fatto insieme"
+),
+condividiAttivo && codiciAmici.length > 1 && React.createElement("select", { value: condividiCon, onChange: e => setCondividiCon(e.target.value), style: { padding: "6px 8px", borderRadius: 8, border: "1px solid " + T.bordo, fontSize: 12 } },
+codiciAmici.map(c => React.createElement("option", { key: c, value: c }, c))
+),
+condividiAttivo && React.createElement("span", { style: { fontSize: 11, color: T.tenue } }, "Toglie vita anche a lui/lei")
+),
 
         React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(90px, 1fr))", gap: 10, marginBottom: 12 } },
           Object.keys(TUTTI).filter(tipo => !nascosti.includes(tipo)).map(tipo => {
@@ -1181,6 +1215,38 @@ const [accessoInCorso, setAccessoInCorso] = useState(false);
         return () => { stoppers.forEach(s => { if (typeof s === "function") s(); }); };
       }, [statoCloud, profile && (profile.codiciAmici || []).join(","), profile && profile.codiceAmico]);
 
+const condividiEventoAmico = useCallback(async (codiceAmico, evento) => {
+if (!codiceAmico || !window.cloud || !window.cloud.inviaEvento) return false;
+return await window.cloud.inviaEvento(codiceAmico, evento);
+}, []);
+
+// Eventi condivisi in arrivo: attività fatte insieme da un amico tolgono/aggiungono vita anche a me
+useEffect(() => {
+if (statoCloud !== "ok" || !profile || !profile.codice) return;
+const stop = window.cloud.ascoltaEventi(profile.codice, (coda) => {
+if (!coda || coda.length === 0) return;
+setProfile(prev => {
+if (!prev) return prev;
+let vita = prev.vitaDays;
+let log = prev.viziLog || [];
+let extra = {};
+coda.forEach(ev => {
+vita = Math.max(0, Math.min(MAX_VITA_DAYS, vita + (ev.vita || 0)));
+log = [{ id: uid(), tipo: ev.tipo, vita: ev.vita, data: new Date().toISOString(), insiemeCon: ev.daNome || "" }, ...log];
+if (ev.tipo === "sigaretta") { extra.cigarettes = (extra.cigarettes ?? prev.cigarettes ?? 0) + 1; extra.lastSmoke = new Date().toISOString(); }
+if (ev.tipo === "drink") { extra.drinks = (extra.drinks ?? prev.drinks ?? 0) + 1; extra.lastDrink = new Date().toISOString(); }
+if (ev.tipo === "sesso") { extra.sesso = (extra.sesso ?? prev.sesso ?? 0) + 1; extra.lastSesso = new Date().toISOString(); }
+});
+const nuovo = { ...prev, ...extra, vitaDays: vita, viziLog: log };
+try { localStorage.setItem("pet-profile", JSON.stringify(nuovo)); } catch (e) {}
+return nuovo;
+});
+window.cloud.svuotaEventi(profile.codice, []);
+});
+return () => { if (typeof stop === "function") stop(); };
+}, [statoCloud, profile && profile.codice]);
+
+
       const saveProfile = useCallback((p) => {
         setProfile(p);
         try { localStorage.setItem("pet-profile", JSON.stringify(p)); } catch (e) {}
@@ -1325,7 +1391,7 @@ const completaLogin = (dati) => {
             React.createElement("div", { style: { fontSize: 64, marginBottom: 12 } }, "😔"),
             React.createElement("h2", { style: { fontSize: 20, fontWeight: 700, color: T.testo, marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, animal.name + " se ne è andato..."),
             React.createElement("button", { style: { marginTop: 24, background: T.accento, color: T.suAccento, border: "none", borderRadius: 18, padding: "11px 28px", fontWeight: 700, cursor: "pointer", fontFamily: "'Quicksand', sans-serif" }, onClick: () => { setAnimal(null); saveProfile(null); } }, "Ricominciare")
-          ) : tab === "home" ? React.createElement(Home, { profile, stage, animal, T }) : tab === "traguardi" ? React.createElement(Traguardi, { profile, setProfile: saveProfile, T }) : tab === "vizi" ? React.createElement(ViziSfizi, { profile, setProfile: saveProfile, T }) : tab === "amico" ? React.createElement(Amico, { profile, amiciDati, statoCloud, setProfile: saveProfile, T }) : tab === "impostazioni" ? React.createElement(Impostazioni, { profile, animal, cambiaTema, resetCucciolo, T, setProfile: saveProfile, cloudUser, onGoogleLogin: accediConGoogle, onSignOut: disconnettiGoogle, accessoInCorso }) : React.createElement(Statistiche, { profile, T })
+          ) : tab === "home" ? React.createElement(Home, { profile, stage, animal, T }) : tab === "traguardi" ? React.createElement(Traguardi, { profile, setProfile: saveProfile, T }) : tab === "vizi" ? React.createElement(ViziSfizi, { profile, setProfile: saveProfile, T, codiciAmici: (profile.codiciAmici || (profile.codiceAmico ? [profile.codiceAmico] : [])), mioNome: profile.mioNome, onCondividi: condividiEventoAmico }) : tab === "amico" ? React.createElement(Amico, { profile, amiciDati, statoCloud, setProfile: saveProfile, T }) : tab === "impostazioni" ? React.createElement(Impostazioni, { profile, animal, cambiaTema, resetCucciolo, T, setProfile: saveProfile, cloudUser, onGoogleLogin: accediConGoogle, onSignOut: disconnettiGoogle, accessoInCorso }) : React.createElement(Statistiche, { profile, T })
         ),
         !isDead && React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(5, 1fr)", background: T.tinta, borderTop: "1px solid " + T.bordo, padding: "10px 8px 16px", gap: 5, flexShrink: 0 } },
           ["home","traguardi","vizi","amico","stats"].map((id, i) => React.createElement("button", { key: id, onClick: () => setTab(id), style: { background: tab === id ? T.accento : T.cardSoft, color: tab === id ? T.suAccento : T.tenue, border: "1px solid " + (tab === id ? T.accento : T.bordo), borderRadius: 12, padding: "12px 0", cursor: "pointer", fontWeight: tab === id ? 700 : 600, fontFamily: "'Quicksand', sans-serif", fontSize: i >= 3 ? 10 : 11 } }, ["Casa","Traguardi","Vizi","Amico","Stats"][i]))
