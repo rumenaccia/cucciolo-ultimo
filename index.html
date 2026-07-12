@@ -110,13 +110,21 @@ getRedirectResult(auth).catch(() => {});
         catch (e) { console.log("ascolta:", e); return () => {}; }
       },
 accediGoogle: async () => {
-try {
 await setPersistence(auth, browserLocalPersistence);
+try {
 await signInWithPopup(auth, provider);
+return { ok: true };
 } catch (e) {
-// Se il popup viene bloccato (o su alcuni browser mobile), uso il redirect
-console.log("popup fallito, uso redirect:", e && e.code);
+const code = (e && e.code) || "";
+if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+return { ok: false, annullato: true };
+}
+if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment") {
 await signInWithRedirect(auth, provider);
+return { ok: true, redirect: true };
+}
+console.log("accediGoogle errore:", code, e && e.message);
+throw e;
 }
 },
 inviaEvento: async (codice, evento) => {
@@ -1875,8 +1883,12 @@ aggiornato: new Date().toISOString(),
 const accediConGoogle = () => {
 if (!window.cloud || !window.cloud.accediGoogle) return;
 setAccessoInCorso(true);
-Promise.resolve(window.cloud.accediGoogle()).catch((e) => {
-console.log("accediGoogle:", e);
+Promise.resolve(window.cloud.accediGoogle())
+.then((res) => {
+if (res && res.annullato) setAccessoInCorso(false);
+})
+.catch((e) => {
+console.log("accediGoogle:", e && e.code);
 setAccessoInCorso(false);
 alert("Non riesco a collegarmi con Google da qui. Riprova tra poco.");
 });
