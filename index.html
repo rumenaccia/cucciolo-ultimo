@@ -70,7 +70,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc, onSnapshot }
       from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, signInWithPopup, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAeofl_uWBxn7gU43s7aCqZoEYyHlEQQTM",
@@ -85,6 +85,10 @@ import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, sig
     const db = getFirestore(app);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: "select_account" });
+// Mantiene l'utente autenticato tra le sessioni (fix: prima non restava loggato)
+setPersistence(auth, browserLocalPersistence).catch(() => {});
+// Gestisce comunque l'eventuale ritorno da redirect (fallback su mobile)
 getRedirectResult(auth).catch(() => {});
 
     // Rendo disponibili all'app tre funzioni semplici
@@ -105,7 +109,16 @@ getRedirectResult(auth).catch(() => {});
         try { return onSnapshot(doc(db, "cuccioli", codice), s => { if (s.exists()) quandoCambia(s.data()); }); }
         catch (e) { console.log("ascolta:", e); return () => {}; }
       },
-accediGoogle: async () => { await signInWithRedirect(auth, provider); },
+accediGoogle: async () => {
+try {
+await setPersistence(auth, browserLocalPersistence);
+await signInWithPopup(auth, provider);
+} catch (e) {
+// Se il popup viene bloccato (o su alcuni browser mobile), uso il redirect
+console.log("popup fallito, uso redirect:", e && e.code);
+await signInWithRedirect(auth, provider);
+}
+},
 inviaEvento: async (codice, evento) => {
 try {
 const ref = doc(db, "eventi", codice);
@@ -1058,7 +1071,15 @@ const [giornoCiclo, setGiornoCiclo] = useState(dataInputOggi());
       const toggleCiclo = () => setProfile({ ...profile, cicloNascosto: !profile.cicloNascosto });
 const [nomeProm, setNomeProm] = useState("");
 const [emojiProm, setEmojiProm] = useState("💊");
-const [intervalloProm, setIntervalloProm] = useState("1");
+const [oraProm, setOraProm] = useState("09:00");
+const [inizioProm, setInizioProm] = useState(dataInputOggi());
+const [freqProm, setFreqProm] = useState("1");
+const [unitaProm, setUnitaProm] = useState("giorni"); // giorni | settimane | mesi
+const [giorniSettProm, setGiorniSettProm] = useState([]); // 0=Lun..6=Dom, vuoto = tutti i giorni
+const [durataProm, setDurataProm] = useState("sempre"); // sempre | 2settimane | mesi | anni | 1
+const [durataNProm, setDurataNProm] = useState("1"); // quantità per mesi/anni
+const [formPromAperto, setFormPromAperto] = useState(false);
+const toggleGiornoSett = (idx) => setGiorniSettProm(prev => prev.includes(idx) ? prev.filter(x => x !== idx) : [...prev, idx].sort((a,b)=>a-b));
 
 const cicli = (profile.cicli || []).slice().sort((a, b) => new Date(b) - new Date(a));
 const intervalli = [];
@@ -1084,10 +1105,43 @@ setProfile({ ...profile, cicli: (profile.cicli || []).filter(d => d !== iso) });
 const promemoria = profile.promemoria || [];
 const aggiungiPromemoria = () => {
 if (!nomeProm.trim()) return;
-const giorni = Math.max(1, parseInt(intervalloProm) || 1);
-const nuovo = { id: uid(), nome: nomeProm.trim(), emoji: emojiProm.trim() || "💊", giorni, ultima: new Date().toISOString() };
+// La data di inizio non può essere nel passato
+const oggiStr = dataInputOggi();
+const inizio = (inizioProm && inizioProm >= oggiStr) ? inizioProm : oggiStr;
+const [oh, om] = (oraProm || "09:00").split(":").map(n => parseInt(n, 10) || 0);
+const freq = Math.max(1, parseInt(freqProm) || 1);
+// Calcolo la data di fine in base alla durata scelta
+const inizioDate = new Date(inizio + "T00:00:00");
+let fine = null; // null = per sempre
+if (durataProm === "1") {
+fine = inizio; // una sola volta: finisce lo stesso giorno di inizio
+} else if (durataProm === "2settimane") {
+const f = new Date(inizioDate); f.setDate(f.getDate() + 14); fine = f.toISOString().slice(0,10);
+} else if (durataProm === "mesi") {
+const n = Math.max(1, parseInt(durataNProm) || 1);
+const f = new Date(inizioDate); f.setMonth(f.getMonth() + n); fine = f.toISOString().slice(0,10);
+} else if (durataProm === "anni") {
+const n = Math.max(1, parseInt(durataNProm) || 1);
+const f = new Date(inizioDate); f.setFullYear(f.getFullYear() + n); fine = f.toISOString().slice(0,10);
+}
+const nuovo = {
+id: uid(),
+nome: nomeProm.trim(),
+emoji: emojiProm.trim() || "💊",
+oraH: oh, oraM: om,
+inizio: inizio,
+giorniSett: [...giorniSettProm],
+freq: freq,
+unita: unitaProm,
+durata: durataProm,
+fine: fine,
+unaVolta: durataProm === "1",
+ultima: null
+};
 setProfile({ ...profile, promemoria: [...promemoria, nuovo] });
-setNomeProm(""); setIntervalloProm("1"); setEmojiProm("💊");
+setNomeProm(""); setEmojiProm("💊"); setOraProm("09:00"); setInizioProm(dataInputOggi());
+setFreqProm("1"); setUnitaProm("giorni"); setGiorniSettProm([]); setDurataProm("sempre"); setDurataNProm("1");
+setFormPromAperto(false);
 };
 const segnaFatto = (id) => {
 const p = promemoria.find(x => x.id === id);
@@ -1099,12 +1153,79 @@ setProfile({ ...profile, promemoria: promemoria.map(x => x.id === id ? { ...x, u
 const cancellaPromemoria = (id) => {
 setProfile({ ...profile, promemoria: promemoria.filter(p => p.id !== id) });
 };
+const SIGLE_GG = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
+const descriviFrequenza = (p) => {
+if (p.giorni && !p.inizio) return "ogni " + p.giorni + "g"; // vecchi promemoria
+if (p.unaVolta) return "una volta";
+const freq = Math.max(1, p.freq || 1);
+const u = p.unita || "giorni";
+const nomeU = u === "settimane" ? (freq === 1 ? "settimana" : "settimane") : u === "mesi" ? (freq === 1 ? "mese" : "mesi") : (freq === 1 ? "giorno" : "giorni");
+let base = "ogni " + (freq === 1 ? "" : freq + " ") + nomeU;
+const gg = p.giorniSett || [];
+if (gg.length > 0 && gg.length < 7) base += " (" + gg.map(i => SIGLE_GG[i]).join(", ") + ")";
+if (p.fine) base += " · fino al " + formatGiornoBreve(p.fine + "T12:00:00");
+else base += " · per sempre";
+return base;
+};
+// Calcola la prossima occorrenza di un promemoria tenendo conto di:
+// data di inizio, ora, giorni della settimana, frequenza e data di fine.
+const prossimaOccorrenza = (p) => {
+// Compatibilità con i vecchi promemoria (avevano solo "giorni")
+if (p.giorni && !p.inizio) {
+const base = p.ultima ? new Date(p.ultima) : new Date();
+return new Date(base.getTime() + p.giorni * 24 * 60 * 60 * 1000);
+}
+const oh = p.oraH != null ? p.oraH : 9;
+const om = p.oraM != null ? p.oraM : 0;
+const giorniSett = p.giorniSett || [];
+const freq = Math.max(1, p.freq || 1);
+const unita = p.unita || "giorni";
+const inizio = new Date((p.inizio || dataInputOggi()) + "T00:00:00");
+const fine = p.fine ? new Date(p.fine + "T23:59:59") : null;
+const adesso = new Date();
+// Se ha una data di fine ed è passata, non ci sono più occorrenze
+if (fine && adesso > fine && (!p.ultima || new Date(p.ultima) > fine)) return null;
+const settimanaAmmessa = (d) => {
+if (giorniSett.length === 0) return true;
+const idx = (d.getDay() + 6) % 7; // 0 = lunedì
+return giorniSett.includes(idx);
+};
+// Parto dalla data di inizio (con l'ora scelta) e avanzo finché non trovo la prima
+// occorrenza futura valida rispetto ai giorni della settimana e alla frequenza.
+let cur = new Date(inizio); cur.setHours(oh, om, 0, 0);
+let guardia = 0;
+const avanza = () => {
+if (unita === "settimane") cur.setDate(cur.getDate() + freq * 7);
+else if (unita === "mesi") cur.setMonth(cur.getMonth() + freq);
+else cur.setDate(cur.getDate() + freq);
+};
+// una sola volta: l'unica occorrenza è la data di inizio
+if (p.unaVolta) {
+if (p.ultima) return null;
+return cur;
+}
+while (guardia < 4000) {
+guardia++;
+if (fine && cur > fine) return null;
+const nonFattaAncora = !p.ultima || cur > new Date(p.ultima);
+if (cur >= adesso && settimanaAmmessa(cur) && nonFattaAncora) return new Date(cur);
+if (cur < adesso && settimanaAmmessa(cur) && nonFattaAncora) {
+// occorrenza scaduta e non completata: è "da fare" adesso
+return new Date(cur);
+}
+avanza();
+}
+return null;
+};
 const statoPromemoria = (p) => {
-const prossima = new Date(new Date(p.ultima).getTime() + p.giorni * 24 * 60 * 60 * 1000);
-const giorni = Math.ceil((prossima - new Date()) / (1000 * 60 * 60 * 24));
-if (giorni <= 0) return { testo: giorni === 0 ? "Da fare oggi" : "In ritardo di " + Math.abs(giorni) + "g", colore: "#FF6B6B" };
-if (giorni === 1) return { testo: "Domani", colore: "#FFB020" };
-return { testo: "Tra " + giorni + " giorni", colore: T.tenue };
+const prossima = prossimaOccorrenza(p);
+if (!prossima) return { testo: "Completato", colore: T.tenue };
+const oraStr = String(prossima.getHours()).padStart(2,"0") + ":" + String(prossima.getMinutes()).padStart(2,"0");
+const giorni = Math.ceil((prossima.setHours(0,0,0,0) - new Date().setHours(0,0,0,0)) / (1000 * 60 * 60 * 24));
+if (giorni < 0) return { testo: "In ritardo di " + Math.abs(giorni) + "g (ore " + oraStr + ")", colore: "#FF6B6B" };
+if (giorni === 0) return { testo: "Oggi alle " + oraStr, colore: "#FF6B6B" };
+if (giorni === 1) return { testo: "Domani alle " + oraStr, colore: "#FFB020" };
+return { testo: "Tra " + giorni + " giorni · ore " + oraStr, colore: T.tenue };
 };
 
 const [permessoNotifiche, setPermessoNotifiche] = useState(
@@ -1132,19 +1253,23 @@ const inviaNotifica = (titolo, corpo) => {
   } catch (e) {}
 };
 useEffect(() => {
-  if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
-  const oggiKey = new Date().toISOString().slice(0, 10);
-  const dovuti = promemoria.filter((p) => {
-    const prossima = new Date(new Date(p.ultima).getTime() + p.giorni * 24 * 60 * 60 * 1000);
-    const g = Math.ceil((prossima - new Date()) / (1000 * 60 * 60 * 24));
-    return g <= 0;
-  });
-  dovuti.forEach((p) => {
-    const chiave = "vv_notif_" + p.id + "_" + oggiKey;
-    if (localStorage.getItem(chiave)) return;
-    inviaNotifica(p.emoji + " " + p.nome, "È il momento: " + p.nome + ". Apri ViceVersa e segna \"Fatto\".");
-    localStorage.setItem(chiave, "1");
-  });
+if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
+const controlla = () => {
+const adesso = new Date();
+const oggiKey = adesso.toISOString().slice(0, 10);
+promemoria.forEach((p) => {
+const prossima = prossimaOccorrenza(p);
+if (!prossima) return;
+if (prossima.getTime() > adesso.getTime()) return;
+const chiave = "vv_notif_" + p.id + "_" + oggiKey;
+if (localStorage.getItem(chiave)) return;
+inviaNotifica(p.emoji + " " + p.nome, "È il momento: " + p.nome + ". Apri ViceVersa e segna \"Fatto\".");
+localStorage.setItem(chiave, "1");
+});
+};
+controlla();
+const timer = setInterval(controlla, 60000);
+return () => clearInterval(timer);
 }, [promemoria, permessoNotifiche]);
 
 const stileCard = { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo };
@@ -1152,12 +1277,12 @@ const stileInput = { padding: "8px 10px", borderRadius: 8, border: "1px solid " 
 
 return React.createElement("div", { style: { padding: "4px 4px" } },
 React.createElement("h2", { style: { fontSize: 16, marginBottom: 8, fontWeight: 700, color: T.testo, fontFamily: "'Fredoka', sans-serif" } }, "Salute 🩺"),
-React.createElement("p", { style: { fontSize: 12, color: T.tenue, marginBottom: 12 } }, "Il ciclo e i tuoi impegni ricorrenti, come le medicine."),
+React.createElement("p", { style: { fontSize: 12, color: T.tenue, marginBottom: 12 } }, cicloNascosto ? "I tuoi impegni ricorrenti, come le medicine." : "Il ciclo e i tuoi impegni ricorrenti, come le medicine."),
 
-React.createElement("div", { style: stileCard },
+(!cicloNascosto) && React.createElement("div", { style: stileCard },
 React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 } },
 React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: T.testo } }, "🩸 Ciclo"),
-React.createElement("button", { onClick: toggleCiclo, style: { background: "transparent", border: "1px solid " + T.bordo, color: T.tenue, borderRadius: 8, padding: "4px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer" } }, cicloNascosto ? "Mostra" : "Nascondi")
+React.createElement("button", { onClick: toggleCiclo, style: { background: "transparent", border: "1px solid " + T.bordo, color: T.tenue, borderRadius: 8, padding: "4px 10px", fontSize: 10, fontWeight: 700, cursor: "pointer" } }, "Nascondi")
 ),
 (!cicloNascosto && (ultimoCiclo
 ? React.createElement("div", { style: { fontSize: 12, color: T.tenue, marginBottom: 6 } }, "Ultimo inizio: " + formatGiornoBreve(ultimoCiclo))
@@ -1197,7 +1322,7 @@ React.createElement("div", { style: { display: "flex", alignItems: "center", gap
 React.createElement("span", { style: { fontSize: 18 } }, p.emoji),
 React.createElement("div", null,
 React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo } }, p.nome),
-React.createElement("div", { style: { fontSize: 10, color: stato.colore, fontWeight: 700 } }, stato.testo + " · ogni " + p.giorni + "g")
+React.createElement("div", { style: { fontSize: 10, color: stato.colore, fontWeight: 700 } }, stato.testo + " · " + descriviFrequenza(p))
 )
 ),
 React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } },
@@ -1207,11 +1332,54 @@ React.createElement("span", { onClick: () => cancellaPromemoria(p.id), style: { 
 );
 })
 ),
-React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap" } },
+!formPromAperto
+? React.createElement("button", { onClick: () => setFormPromAperto(true), style: { width: "100%", background: T.cardSoft, color: T.accento, border: "1px dashed " + T.accento, borderRadius: 10, padding: "10px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "＋ Nuovo promemoria")
+: React.createElement("div", { style: { background: T.scuro ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.6)", borderRadius: 10, padding: 12 } },
+React.createElement("div", { style: { display: "flex", gap: 6, marginBottom: 8 } },
 React.createElement("input", { value: emojiProm, onChange: e => setEmojiProm(e.target.value), placeholder: "💊", style: { ...stileInput, width: 44, textAlign: "center" } }),
-React.createElement("input", { value: nomeProm, onChange: e => setNomeProm(e.target.value), placeholder: "Es. Medicina", style: { ...stileInput, flex: 1, minWidth: 100 } }),
-React.createElement("input", { type: "number", min: "1", value: intervalloProm, onChange: e => setIntervalloProm(e.target.value), placeholder: "Giorni", style: { ...stileInput, width: 64 } }),
-React.createElement("button", { onClick: aggiungiPromemoria, style: { background: T.accento, color: "#fff", border: "none", borderRadius: 8, padding: "8px 14px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "＋ Aggiungi")
+React.createElement("input", { value: nomeProm, onChange: e => setNomeProm(e.target.value), placeholder: "Es. Medicina", style: { ...stileInput, flex: 1, minWidth: 80 } })
+),
+React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" } },
+React.createElement("div", { style: { flex: 1, minWidth: 120 } },
+React.createElement("div", { style: { fontSize: 10, color: T.tenue, marginBottom: 3, fontWeight: 700 } }, "Ora"),
+React.createElement("input", { type: "time", value: oraProm, onChange: e => setOraProm(e.target.value || "09:00"), style: { ...stileInput, width: "100%" } })
+),
+React.createElement("div", { style: { flex: 1, minWidth: 120 } },
+React.createElement("div", { style: { fontSize: 10, color: T.tenue, marginBottom: 3, fontWeight: 700 } }, "Dal giorno"),
+React.createElement("input", { type: "date", value: inizioProm, min: dataInputOggi(), onChange: e => setInizioProm((e.target.value && e.target.value >= dataInputOggi()) ? e.target.value : dataInputOggi()), style: { ...stileInput, width: "100%" } })
+),
+),
+React.createElement("div", { style: { marginBottom: 8 } },
+React.createElement("div", { style: { fontSize: 10, color: T.tenue, marginBottom: 4, fontWeight: 700 } }, "Giorni della settimana (nessuno = tutti)"),
+React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 3 } },
+["L","M","M","G","V","S","D"].map((sig, idx) => React.createElement("button", { key: idx, onClick: () => toggleGiornoSett(idx), style: { padding: "6px 0", borderRadius: 8, cursor: "pointer", fontSize: 11, fontWeight: 700, background: giorniSettProm.includes(idx) ? T.accento : "transparent", color: giorniSettProm.includes(idx) ? T.suAccento : T.testo, border: "1px solid " + (giorniSettProm.includes(idx) ? T.accento : T.bordo) } }, sig))
+)
+),
+React.createElement("div", { style: { display: "flex", gap: 6, alignItems: "center", marginBottom: 8, flexWrap: "wrap" } },
+React.createElement("span", { style: { fontSize: 11, color: T.tenue, fontWeight: 700 } }, "Ogni"),
+React.createElement("input", { type: "number", min: "1", value: freqProm, onChange: e => setFreqProm(e.target.value.replace(/[^0-9]/g, "") || "1"), style: { ...stileInput, width: 56, textAlign: "center" } }),
+React.createElement("select", { value: unitaProm, onChange: e => setUnitaProm(e.target.value), style: { ...stileInput } },
+React.createElement("option", { value: "giorni" }, "giorni"),
+React.createElement("option", { value: "settimane" }, "settimane"),
+React.createElement("option", { value: "mesi" }, "mesi")
+)
+),
+React.createElement("div", { style: { display: "flex", gap: 6, alignItems: "center", marginBottom: 10, flexWrap: "wrap" } },
+React.createElement("span", { style: { fontSize: 11, color: T.tenue, fontWeight: 700 } }, "Per"),
+React.createElement("select", { value: durataProm, onChange: e => setDurataProm(e.target.value), style: { ...stileInput } },
+React.createElement("option", { value: "sempre" }, "sempre"),
+React.createElement("option", { value: "1" }, "una sola volta"),
+React.createElement("option", { value: "2settimane" }, "due settimane"),
+React.createElement("option", { value: "mesi" }, "mesi"),
+React.createElement("option", { value: "anni" }, "anni")
+),
+(durataProm === "mesi" || durataProm === "anni") && React.createElement("input", { type: "number", min: "1", value: durataNProm, onChange: e => setDurataNProm(e.target.value.replace(/[^0-9]/g, "") || "1"), style: { ...stileInput, width: 56, textAlign: "center" } }),
+(durataProm === "mesi" || durataProm === "anni") && React.createElement("span", { style: { fontSize: 11, color: T.tenue } }, durataProm === "mesi" ? "mesi" : "anni")
+),
+React.createElement("div", { style: { display: "flex", gap: 8 } },
+React.createElement("button", { onClick: () => setFormPromAperto(false), style: { flex: 1, background: "transparent", color: T.tenue, border: "1px solid " + T.bordo, borderRadius: 8, padding: "9px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "Annulla"),
+React.createElement("button", { onClick: aggiungiPromemoria, disabled: !nomeProm.trim(), style: { flex: 1, background: nomeProm.trim() ? T.accento : "rgba(150,150,170,0.3)", color: "#fff", border: "none", borderRadius: 8, padding: "9px", fontWeight: 700, fontSize: 12, cursor: nomeProm.trim() ? "pointer" : "default" } }, "＋ Aggiungi")
+)
 )
 )
 );
@@ -1439,7 +1607,18 @@ return React.createElement("button", { key: "vz_" + tipo, onClick: () => setProf
 )
 ),
 
-// Guida: come funziona
+// Sezione riservata: mostra/nascondi la parte "Ciclo" nella scheda Salute. Dicitura neutra per riservatezza.
+        React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
+          React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between" } },
+            React.createElement("div", null,
+              React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo } }, "Sezione riservata"),
+              React.createElement("div", { style: { fontSize: 10, color: T.tenue, marginTop: 2 } }, profile.cicloNascosto ? "Attualmente nascosta dalla scheda Salute" : "Visibile nella scheda Salute")
+            ),
+            React.createElement("button", { onClick: () => setProfile({ ...profile, cicloNascosto: !profile.cicloNascosto }), style: { background: profile.cicloNascosto ? T.accento : "transparent", color: profile.cicloNascosto ? T.suAccento : T.tenue, border: "1px solid " + (profile.cicloNascosto ? T.accento : T.bordo), borderRadius: 8, padding: "6px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer" } }, profile.cicloNascosto ? "Mostra" : "Nascondi")
+          )
+        ),
+
+        // Guida: come funziona
         React.createElement("div", { style: { background: T.cardSoft, borderRadius: 12, padding: 14, marginBottom: 16, border: "1px solid " + T.bordo } },
           React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: T.testo, marginBottom: 10 } }, "Come funziona 📖"),
 [
@@ -1447,7 +1626,7 @@ return React.createElement("button", { key: "vz_" + tipo, onClick: () => setProf
 ["🎯 Traguardi", "Segna studio, sonno, esami, igiene e sport: ognuno aggiunge vita e punti. Ci sono limiti al giorno. L'esame dà vita in base al voto, la bocciatura la toglie. Puoi crearne di tuoi e registrarli anche per giorni passati."],
 ["🚬 Vizi & Sfizi", "Ogni vizio toglie mesi di vita (il sesso ne aggiunge). Ogni tocco finisce nel calendario con data e ora. Puoi aggiungere vizi tuoi con emoji e mesi, e registrarli anche per giorni passati."],
 ["👥 Amico", "Dai il tuo codice al partner e inserisci il suo: vedrete il cucciolo l'uno dell'altra, che si aggiorna da solo. Da qui potete anche fare qualcosa insieme, condividendo l'evento."],
-["🩺 Salute", "Segna l'inizio del ciclo e ricevi una stima di quando potrebbe tornare. Aggiungi promemoria per impegni che si ripetono, come le medicine: l'app ti avvisa quando è il momento."],
+["🩺 Salute", (profile.cicloNascosto ? "Aggiungi promemoria per impegni che si ripetono, come le medicine: l'app ti avvisa quando è il momento, nei giorni e alle ore che scegli." : "Segna l'inizio del ciclo e ricevi una stima di quando potrebbe tornare. Aggiungi promemoria per impegni che si ripetono, come le medicine: l'app ti avvisa quando è il momento, nei giorni e alle ore che scegli.")],
 ["📊 Dati", "I tuoi numeri: giorni senza fumare o bere e traguardi totali. Qui puoi anche creare obiettivi tutti tuoi: al raggiungimento guadagni punti vita extra."],
 ["⚙️ Impostazioni", "Cambia tema, vedi da quanto hai il cucciolo, o ricomincia da capo."],
 ].map((riga, i) => React.createElement("div", { key: i, style: { marginBottom: 8 } },
