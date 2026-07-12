@@ -820,7 +820,7 @@ const [condividiCon, setCondividiCon] = useState((codiciAmici && codiciAmici[0])
         if (tipo === "sesso") { nuovo.sesso = (profile.sesso || 0) + 1; if (!profile.lastSesso || dataEvento >= profile.lastSesso) nuovo.lastSesso = dataEvento; }
         setProfile(nuovo);
         if (condividiAttivo && condividiCon && onCondividi) {
-          onCondividi(condividiCon, { id: uid(), tipo: tipo, vita: t.vita, daNome: mioNome || "", data: dataEvento });
+          onCondividi(condividiCon, { id: uid(), tipo: tipo, vita: t.vita, daNome: mioNome || "", daCodice: profile.codice, richiedeConferma: true, data: dataEvento });
         }
       };
       const creaVizio = () => {
@@ -960,6 +960,7 @@ if (c === profile.codice) { setAvviso("Questo è il tuo codice!"); return; }
 if (codici.includes(c)) { setAvviso("Amico già collegato"); return; }
 if (codici.length >= 10) { setAvviso("Massimo 10 amici"); return; }
 setProfile({ ...profile, codiciAmici: [...codici, c], codiceAmico: undefined });
+if (onCondividi) onCondividi(c, { id: uid(), tipo: "amico_aggiunto", daNome: profile.mioNome || "", daCodice: profile.codice, data: new Date().toISOString() });
 setNuovoCodice(""); setAvviso("");
 };
 
@@ -981,7 +982,7 @@ if (tipo === "sigaretta") { nuovo.cigarettes = (profile.cigarettes || 0) + 1; nu
 if (tipo === "drink") { nuovo.drinks = (profile.drinks || 0) + 1; nuovo.lastDrink = adesso; }
 if (tipo === "sesso") { nuovo.sesso = (profile.sesso || 0) + 1; nuovo.lastSesso = adesso; }
 setProfile(nuovo);
-if (onCondividi) onCondividi(codice, { id: uid(), tipo: tipo, vita: t.vita, daNome: profile.mioNome || "", data: adesso });
+if (onCondividi) onCondividi(codice, { id: uid(), tipo: tipo, vita: t.vita, daNome: profile.mioNome || "", daCodice: profile.codice, richiedeConferma: true, data: adesso });
 setInviato(prev => ({ ...prev, [codice]: tipo }));
 setTimeout(() => setInviato(prev => ({ ...prev, [codice]: null })), 2200);
 };
@@ -1665,7 +1666,54 @@ React.createElement("div", { style: { fontSize: 11, color: T.tenue, lineHeight: 
 
     const PROFILE_DEFAULTS = { points: 0, vitaDays: MAX_VITA_DAYS, cigarettes: 0, drinks: 0, sesso: 0, viziLog: [], milestones: [], scalaNuova: true, cicli: [], promemoria: [], obiettivi: [] };
 
-    function CucciolataApp() {
+    // Banner delle richieste di conferma: attività che un amico dice di aver fatto insieme a te.
+function RichiesteInSospeso({ profile, setProfile, T }) {
+const richieste = profile.richiesteInSospeso || [];
+if (richieste.length === 0) return null;
+const etichetta = (tipo) => (VIZI_TIPI[tipo] || { label: tipo, emoji: "•" });
+const conferma = (r) => {
+const extra = {};
+if (r.tipo === "sigaretta") { extra.cigarettes = (profile.cigarettes || 0) + 1; extra.lastSmoke = new Date().toISOString(); }
+if (r.tipo === "drink") { extra.drinks = (profile.drinks || 0) + 1; extra.lastDrink = new Date().toISOString(); }
+if (r.tipo === "sesso") { extra.sesso = (profile.sesso || 0) + 1; extra.lastSesso = new Date().toISOString(); }
+const voce = { id: uid(), tipo: r.tipo, vita: r.vita, data: new Date().toISOString(), insiemeCon: r.daNome || "" };
+setProfile({ ...profile, ...extra, vitaDays: Math.max(0, (profile.vitaDays || 0) + (r.vita || 0)), viziLog: [voce, ...(profile.viziLog || [])], richiesteInSospeso: richieste.filter(x => x.id !== r.id) });
+};
+const rifiuta = (r) => setProfile({ ...profile, richiesteInSospeso: richieste.filter(x => x.id !== r.id) });
+return React.createElement("div", { style: { marginBottom: 14 } },
+richieste.map(r => {
+const info = etichetta(r.tipo);
+return React.createElement("div", { key: r.id, style: { background: T.card, border: "1px solid " + T.bordo, borderRadius: 14, padding: 12, marginBottom: 8 } },
+React.createElement("div", { style: { fontSize: 12, color: T.testo, marginBottom: 8 } },
+React.createElement("span", { style: { fontSize: 18, marginRight: 6 } }, info.emoji),
+React.createElement("span", { style: { fontWeight: 700 } }, (r.daNome || "Un amico")),
+" dice di aver fatto ", React.createElement("span", { style: { fontWeight: 700 } }, info.label), " insieme a te. Confermi?"
+),
+React.createElement("div", { style: { display: "flex", gap: 8 } },
+React.createElement("button", { onClick: () => rifiuta(r), style: { flex: 1, background: "transparent", color: T.tenue, border: "1px solid " + T.bordo, borderRadius: 10, padding: "9px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "No, non è vero"),
+React.createElement("button", { onClick: () => conferma(r), style: { flex: 1, background: T.accento, color: T.suAccento, border: "none", borderRadius: 10, padding: "9px", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "Sì, confermo")
+)
+);
+})
+);
+}
+
+// Notifica esterna riutilizzabile (funziona quando l'app è aperta o in background recente).
+// Su iPhone le notifiche ad app chiusa richiedono i push server-side (VAPID/FCM), non gestiti qui.
+function notificaEsterna(titolo, corpo, tag) {
+try {
+if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
+if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+navigator.serviceWorker.ready.then((reg) => {
+reg.showNotification(titolo, { body: corpo, tag: tag || "viceversa", icon: "ragdoll.PNG", badge: "ragdoll.PNG" });
+}).catch(() => { try { new Notification(titolo, { body: corpo }); } catch (e) {} });
+} else {
+try { new Notification(titolo, { body: corpo }); } catch (e) {}
+}
+} catch (e) {}
+}
+
+function CucciolataApp() {
       const [profile, setProfile] = useState(null);
       const [animal, setAnimal] = useState(null);
       const [loaded, setLoaded] = useState(false);
@@ -1676,6 +1724,7 @@ React.createElement("div", { style: { fontSize: 11, color: T.tenue, lineHeight: 
       const [statoCloud, setStatoCloud] = useState("attesa"); // attesa | ok | offline
 const [cloudUser, setCloudUser] = useState(null); // utente Google collegato, se presente
 const [accessoInCorso, setAccessoInCorso] = useState(false);
+const [recuperoInCorso, setRecuperoInCorso] = useState(false);
 
       useEffect(() => {
         try {
@@ -1806,15 +1855,29 @@ setProfile(prev => {
 if (!prev) return prev;
 let vita = prev.vitaDays;
 let log = prev.viziLog || [];
+let richieste = prev.richiesteInSospeso || [];
 let extra = {};
+const idsVisti = new Set(richieste.map(r => r.id));
 coda.forEach(ev => {
+if (ev.tipo === "amico_aggiunto") {
+notificaEsterna("👥 Nuovo amico", (ev.daNome || "Qualcuno") + " ti ha aggiunto come amico su ViceVersa", "amico_" + (ev.id || ""));
+return;
+}
+if (ev.richiedeConferma) {
+if (!idsVisti.has(ev.id)) {
+idsVisti.add(ev.id);
+richieste = [{ id: ev.id, tipo: ev.tipo, vita: ev.vita, daNome: ev.daNome || "", daCodice: ev.daCodice || "", data: ev.data || new Date().toISOString() }, ...richieste];
+notificaEsterna("👫 Confermi?", (ev.daNome || "Un amico") + " dice di aver fatto un\u2019attività insieme a te. Apri l\u2019app per confermare.", "conferma_" + ev.id);
+}
+return;
+}
 vita = Math.max(0, vita + (ev.vita || 0));
 log = [{ id: uid(), tipo: ev.tipo, vita: ev.vita, data: new Date().toISOString(), insiemeCon: ev.daNome || "" }, ...log];
 if (ev.tipo === "sigaretta") { extra.cigarettes = (extra.cigarettes ?? prev.cigarettes ?? 0) + 1; extra.lastSmoke = new Date().toISOString(); }
 if (ev.tipo === "drink") { extra.drinks = (extra.drinks ?? prev.drinks ?? 0) + 1; extra.lastDrink = new Date().toISOString(); }
 if (ev.tipo === "sesso") { extra.sesso = (extra.sesso ?? prev.sesso ?? 0) + 1; extra.lastSesso = new Date().toISOString(); }
 });
-const nuovo = { ...prev, ...extra, vitaDays: vita, viziLog: log };
+const nuovo = { ...prev, ...extra, vitaDays: vita, viziLog: log, richiesteInSospeso: richieste };
 try { localStorage.setItem("pet-profile", JSON.stringify(nuovo)); } catch (e) {}
 return nuovo;
 });
@@ -1842,13 +1905,16 @@ else window.addEventListener("cloud-pronto", setup);
 return () => { window.removeEventListener("cloud-pronto", setup); off(); };
 }, []);
 
-// Se sono collegata con Google e non ho ancora un cucciolo su questo telefono, lo recupero dal mio account
+// Se sono collegata con Google e non ho ancora un cucciolo su questo telefono, lo recupero dal mio account.
+// Mentre recupero mostro una schermata d'attesa, così da un nuovo dispositivo non si ricomincia da capo.
 useEffect(() => {
 if (statoCloud !== "ok" || !loaded || !cloudUser) return;
 if (profile) return;
 let annullato = false;
+setRecuperoInCorso(true);
 window.cloud.leggiAccount(cloudUser.uid).then(dati => {
-if (annullato || !dati || !dati.backupProfilo) return;
+if (annullato) return;
+if (!dati || !dati.backupProfilo) { setRecuperoInCorso(false); return; }
 try {
 const p = JSON.parse(dati.backupProfilo);
 const a = dati.backupAnimale ? JSON.parse(dati.backupAnimale) : null;
@@ -1865,7 +1931,8 @@ return p;
 if (a) setAnimal(prev => prev || a);
 if (l) setDatiLogin(prev => prev || l);
 } catch (e) {}
-});
+setRecuperoInCorso(false);
+}).catch(() => { if (!annullato) setRecuperoInCorso(false); });
 return () => { annullato = true; };
 }, [statoCloud, loaded, profile, cloudUser]);
 
@@ -1936,6 +2003,13 @@ const completaLogin = (dati) => {
       };
 
       if (!loaded) return React.createElement("div");
+      if (cloudUser && !profile && recuperoInCorso) {
+        return React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", background: "linear-gradient(135deg, #FFE8F5, #E8F5FF)", textAlign: "center", padding: 24 } },
+          React.createElement("div", { style: { fontSize: 48, marginBottom: 12 } }, "🐾"),
+          React.createElement("div", { style: { fontSize: 16, fontWeight: 700, color: "#4A3A6B", fontFamily: "'Fredoka', sans-serif", marginBottom: 6 } }, "Recupero il tuo cucciolo…"),
+          React.createElement("div", { style: { fontSize: 12, color: "#8F84B0" } }, "Sto ripristinando i tuoi dati dall'account Google")
+        );
+      }
       if (!datiLogin) return React.createElement(Login, { onDone: completaLogin, onGoogleLogin: accediConGoogle, accessoInCorso, nomeGoogle: cloudUser ? (cloudUser.displayName || "") : "" });
       if (!animal) return React.createElement(AnimalSelector, { onSelect: selectAnimal });
       if (!profile) return React.createElement(AnimalSelector, { onSelect: selectAnimal });
@@ -1968,6 +2042,7 @@ const completaLogin = (dati) => {
           )
         ),
         React.createElement("div", { style: { flex: 1, background: T.pannello, backdropFilter: "blur(10px)", borderRadius: "24px 24px 0 0", padding: "20px 18px", overflowY: "auto", WebkitOverflowScrolling: "touch", overscrollBehavior: "contain", borderTop: "1px solid " + T.bordo } },
+          !isDead && React.createElement(RichiesteInSospeso, { profile, setProfile: saveProfile, T }),
           isDead ? React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", textAlign: "center" } },
             React.createElement("div", { style: { fontSize: 64, marginBottom: 12 } }, "😔"),
             React.createElement("h2", { style: { fontSize: 20, fontWeight: 700, color: T.testo, marginBottom: 8, fontFamily: "'Fredoka', sans-serif" } }, animal.name + " se ne è andato..."),
